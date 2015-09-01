@@ -1,12 +1,12 @@
 package com.github.githubpeon.formula.binding;
 
-public class FormFieldBinding extends FormBinding {
+public abstract class FormFieldBinding<T extends Object> extends FormBinding<T> {
 
 	private String property;
 	private PropertyMap propertyMap;
 	private boolean required;
 
-	public FormFieldBinding(Object view, FormBinder formBinder, PropertyMap propertyMap, String property, boolean required) {
+	public FormFieldBinding(T view, FormBinder formBinder, PropertyMap propertyMap, String property, boolean required) {
 		super(view, formBinder);
 		this.propertyMap = propertyMap;
 		this.property = property;
@@ -29,6 +29,14 @@ public class FormFieldBinding extends FormBinding {
 		this.property = property;
 	}
 
+	public Object getPropertyValue() {
+		return this.propertyMap.get(this.property);
+	}
+
+	public void setPropertyValue(Object value) {
+		this.propertyMap.put(this.property, value);
+	}
+
 	public boolean isRequired() {
 		return required;
 	}
@@ -37,7 +45,20 @@ public class FormFieldBinding extends FormBinding {
 		this.required = required;
 	}
 
-	protected void setPropertyValue(Object value) {
-		getPropertyMap().put(getProperty(), value);
+	public boolean isEmpty() {
+		Object value = getPropertyMap().get(getProperty());
+		if (value == null) {
+			return true;
+		} else if (value instanceof String) {
+			String valueString = (String) value;
+			return valueString.isEmpty();
+		}
+		return false;
+	}
+
+	public abstract void read();
+
+	public void write(Object value) {
+		setPropertyValue(value);
 	}
 }

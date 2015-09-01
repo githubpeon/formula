@@ -19,8 +19,9 @@ import com.github.githubpeon.formula.binding.AbstractFormBinder;
 import com.github.githubpeon.formula.binding.BindingException;
 import com.github.githubpeon.formula.binding.FormBinding;
 import com.github.githubpeon.formula.binding.FormFieldBinding;
-import com.github.githubpeon.formula.event.FormEvent;
-import com.github.githubpeon.formula.event.FormEvent.FormEventId;
+import com.github.githubpeon.formula.event.FormFieldFocusGainedEvent;
+import com.github.githubpeon.formula.event.FormFieldFocusLostEvent;
+import com.github.githubpeon.formula.validation.FieldValidator;
 
 public class SwingFormBinder extends AbstractFormBinder<Container> implements FocusListener {
 
@@ -34,8 +35,8 @@ public class SwingFormBinder extends AbstractFormBinder<Container> implements Fo
 
 	@Override
 	protected Set<FormBinding> bindFormFields(Container form) {
-		Set<FormBinding> components = bindContainer(form);
-		return components;
+		Set<FormBinding> formBindings = bindContainer(form);
+		return formBindings;
 	}
 
 	@Override
@@ -61,6 +62,15 @@ public class SwingFormBinder extends AbstractFormBinder<Container> implements Fo
 					String property = formFieldAnnotation.value();
 					boolean required = formFieldAnnotation.required();
 					FormFieldBinding formFieldBinding = bindFormField(formField, property, required);
+
+					Class validatorClass = formFieldAnnotation.validator();
+					try {
+						FieldValidator fieldValidator = (FieldValidator) validatorClass.newInstance();
+						fieldValidator.setFormFieldBinding(formFieldBinding);
+						getValidator().addFieldValidator(fieldValidator);
+					} catch (Exception e) {
+						throw new BindingException(e.getClass().getName() + " when creating validator " + validatorClass.getName() + ".", e);
+					}
 					formBindings.add(formFieldBinding);
 				} else if (field.isAnnotationPresent(CommitsForm.class)) {
 					field.setAccessible(true);
@@ -85,12 +95,12 @@ public class SwingFormBinder extends AbstractFormBinder<Container> implements Fo
 
 	@Override
 	public void focusGained(FocusEvent e) {
-		fireFormEvent(new FormEvent(this, FormEventId.FORM_FIELD_FOCUS_GAINED, e.getSource()));
+		fireFormFieldEvent(new FormFieldFocusGainedEvent(this, e.getSource()));
 	}
 
 	@Override
 	public void focusLost(FocusEvent e) {
-		fireFormEvent(new FormEvent(this, FormEventId.FORM_FIELD_FOCUS_LOST, e.getSource()));
+		fireFormFieldEvent(new FormFieldFocusLostEvent(this, e.getSource()));
 	}
 
 }

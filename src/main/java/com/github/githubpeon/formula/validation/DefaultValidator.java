@@ -5,11 +5,31 @@ import java.util.Map;
 import java.util.Set;
 
 import com.github.githubpeon.formula.binding.FormBinding;
-import com.github.githubpeon.formula.binding.FormFieldBinding;
 
 public class DefaultValidator<T extends Map> implements Validator<T> {
 
+	private final Set<FieldValidator> fieldValidators = new HashSet<FieldValidator>();
 	private Set<FormBinding> formBindings = new HashSet<FormBinding>();
+
+	public DefaultValidator() {
+	}
+
+	public DefaultValidator(Set<FormBinding> formBindings) {
+		this.formBindings = formBindings;
+	}
+
+	public Set<FieldValidator> getFieldValidators() {
+		return fieldValidators;
+	}
+
+	@Override
+	public void addFieldValidator(FieldValidator fieldValidator) {
+		fieldValidators.add(fieldValidator);
+	}
+
+	public Set<FormBinding> getFormBindings() {
+		return formBindings;
+	}
 
 	@Override
 	public void setFormBindings(Set<FormBinding> formBindings) {
@@ -18,21 +38,22 @@ public class DefaultValidator<T extends Map> implements Validator<T> {
 
 	@Override
 	public ValidationResult validate(T model) {
-		ValidationResult validationResult = new ValidationResult();
-
-		for (FormBinding formBinding : formBindings) {
-			if (formBinding instanceof FormFieldBinding) {
-				FormFieldBinding formFieldBinding = (FormFieldBinding) formBinding;
-				if (formFieldBinding.isRequired()) {
-					Object value = model.get(formFieldBinding.getProperty());
-					if (value == null
-							|| (value instanceof String && ((String) value).trim().isEmpty())) {
-						validationResult.addError(formFieldBinding.getProperty(), ValidationError.REQUIRED_FIELD_MISSING.toString());
-					}
-				}
-			}
+		ValidationResult validationResult = validateFields(model, new ValidationResult());
+		if (!validationResult.hasErrors()) {
+			validationResult = validateForm(model, validationResult);
 		}
 		return validationResult;
 	}
 
+	protected ValidationResult validateFields(T model, ValidationResult validationResult) {
+		for (FieldValidator fieldValidator : fieldValidators) {
+			ValidationResult fieldValidationResult = fieldValidator.validate(model);
+			validationResult.getPropertyValidationMessages().putAll(fieldValidationResult.getPropertyValidationMessages());
+		}
+		return validationResult;
+	}
+
+	protected ValidationResult validateForm(T model, ValidationResult validationResult) {
+		return validationResult;
+	}
 }

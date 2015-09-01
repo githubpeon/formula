@@ -1,24 +1,20 @@
 package com.github.githubpeon.formula.binding;
 
-import com.github.githubpeon.formula.event.FormEvent;
-import com.github.githubpeon.formula.event.FormListener;
+public class FormBinding<T extends Object> {
 
-public class FormBinding implements FormListener {
-
-	private Object view;
+	private T view;
 	private FormBinder formBinder;
 
-	public FormBinding(Object view, FormBinder formBinder) {
+	public FormBinding(T view, FormBinder formBinder) {
 		this.view = view;
 		this.formBinder = formBinder;
-		formBinder.addFormListener(this);
 	}
 
-	public Object getView() {
+	public T getView() {
 		return view;
 	}
 
-	public void setView(Object view) {
+	public void setView(T view) {
 		this.view = view;
 	}
 
@@ -30,8 +26,4 @@ public class FormBinding implements FormListener {
 		this.formBinder = formBinder;
 	}
 
-	@Override
-	public void handleFormEvent(FormEvent e) {
-		// Default is to do nothing.
-	}
 }

@@ -1,0 +1,17 @@
+package com.github.githubpeon.formula.event;
+
+import com.github.githubpeon.formula.binding.FormBinder;
+import com.github.githubpeon.formula.validation.ValidationResult;
+
+public class FormEditValidationEvent extends FormValidationEvent {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3683203752178776038L;
+
+	public FormEditValidationEvent(FormBinder source, ValidationResult validationResult) {
+		super(source, validationResult);
+	}
+
+}

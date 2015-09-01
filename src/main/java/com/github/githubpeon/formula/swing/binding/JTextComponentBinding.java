@@ -8,7 +8,7 @@ import com.github.githubpeon.formula.binding.FormBinder;
 import com.github.githubpeon.formula.binding.FormFieldBinding;
 import com.github.githubpeon.formula.binding.PropertyMap;
 
-public class JTextComponentBinding extends FormFieldBinding implements DocumentListener {
+public class JTextComponentBinding extends FormFieldBinding<JTextComponent> implements DocumentListener {
 
 	public JTextComponentBinding(JTextComponent jTextComponent, FormBinder formBinder, PropertyMap propertyMap, String property, boolean required) {
 		super(jTextComponent, formBinder, propertyMap, property, required);
@@ -16,20 +16,22 @@ public class JTextComponentBinding extends FormFieldBinding implements DocumentL
 	}
 
 	@Override
+	public void read() {
+		getView().setText((String) getPropertyValue());
+	}
+
+	@Override
 	public void insertUpdate(DocumentEvent e) {
-		JTextComponent jTextComponent = (JTextComponent) getView();
-		setPropertyValue(jTextComponent.getText());
+		write(getView().getText());
 	}
 
 	@Override
 	public void removeUpdate(DocumentEvent e) {
-		JTextComponent jTextComponent = (JTextComponent) getView();
-		setPropertyValue(jTextComponent.getText());
+		write(getView().getText());
 	}
 
 	@Override
 	public void changedUpdate(DocumentEvent e) {
 		// We don't care about this.
 	}
-
 }

@@ -8,20 +8,20 @@ public class ValidationMessage {
 		ERROR;
 	}
 
-	private String message;
+	private Object content;
 	private Severity severity;
 
-	public ValidationMessage(String message, Severity severity) {
-		this.message = message;
+	public ValidationMessage(Object content, Severity severity) {
+		this.content = content;
 		this.severity = severity;
 	}
 
-	public String getMessage() {
-		return message;
+	public Object getContent() {
+		return content;
 	}
 
-	public void setMessage(String message) {
-		this.message = message;
+	public void setContent(Object content) {
+		this.content = content;
 	}
 
 	public Severity getSeverity() {
@@ -34,6 +34,6 @@ public class ValidationMessage {
 
 	@Override
 	public String toString() {
-		return getMessage();
+		return getContent().toString();
 	}
 }
