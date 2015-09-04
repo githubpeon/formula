@@ -1,15 +1,11 @@
 package com.github.githubpeon.formula.binding;
 
-import java.beans.BeanInfo;
-import java.beans.Introspector;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
+
+import org.minimalcode.beans.ObjectWrapper;
 
 import com.github.githubpeon.formula.annotation.Form;
 import com.github.githubpeon.formula.event.FormCommitValidationEvent;
@@ -32,10 +28,10 @@ public abstract class AbstractFormBinder<T extends Object> implements FormBinder
 	private final Set<FormFieldListener> formFieldListeners = new HashSet<FormFieldListener>();
 	private final Set<FormValidationListener> formValidationListeners = new HashSet<FormValidationListener>();
 	private final PropertyMap propertyMap = new PropertyMap();
-	private final Map<String, PropertyDescriptor> propertyDescriptors = new HashMap<String, PropertyDescriptor>();
 	private T form;
 	private Object model;
 	private Validator validator;
+	private ObjectWrapper objectWrapper;
 
 	public AbstractFormBinder() {
 		propertyMap.addPropertyChangeListener(this);
@@ -62,20 +58,7 @@ public abstract class AbstractFormBinder<T extends Object> implements FormBinder
 
 	public void setModel(Object model) {
 		this.model = model;
-		this.propertyDescriptors.clear();
-
-		try {
-			BeanInfo beanInfo = Introspector.getBeanInfo(getModel().getClass());
-			PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
-
-			for (int i = 0; i < propertyDescriptors.length; ++i) {
-				if (!propertyDescriptors[i].getName().equals("class")) {
-					this.propertyDescriptors.put(propertyDescriptors[i].getName(), propertyDescriptors[i]);
-				}
-			}
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		this.objectWrapper = new ObjectWrapper(model);
 	}
 
 	public Validator getValidator() {
@@ -132,7 +115,7 @@ public abstract class AbstractFormBinder<T extends Object> implements FormBinder
 	@Override
 	public ValidationResult validate() {
 		if (getValidator() != null) {
-			ValidationResult validationResult = getValidator().validate(getPropertyMap());
+			ValidationResult validationResult = getValidator().validate(this.propertyMap);
 			return validationResult;
 		} else {
 			return null;
@@ -144,8 +127,8 @@ public abstract class AbstractFormBinder<T extends Object> implements FormBinder
 		ValidationResult validationResult = validate();
 		fireFormValidationEvent(new FormCommitValidationEvent(this, validationResult));
 		if (!validationResult.hasErrors()) {
-			System.out.println("Commit: " + propertyMap + " to " + getModel());
 			write();
+			System.out.println("Commit: " + propertyMap + " to " + getModel());
 			fireFormEvent(new FormCommittedEvent(this));
 		}
 	}
@@ -241,32 +224,16 @@ public abstract class AbstractFormBinder<T extends Object> implements FormBinder
 	}
 
 	private void read() {
-		for (PropertyDescriptor propertyDescriptor : this.propertyDescriptors.values()) {
-			Method readMethod = propertyDescriptor.getReadMethod();
-			try {
-				Object value = readMethod.invoke(getModel());
-				getPropertyMap().put(propertyDescriptor.getName(), value);
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
+		for (String key : this.propertyMap.keySet()) {
+			Object value = this.objectWrapper.getValue(key);
+			this.propertyMap.put(key, value);
 		}
 	}
 
 	private void write() {
-		for (String key : getPropertyMap().keySet()) {
-			Object value = getPropertyMap().get(key);
-
-			PropertyDescriptor propertyDescriptor = this.propertyDescriptors.get(key);
-			if (propertyDescriptor != null) {
-				Method writeMethod = propertyDescriptor.getWriteMethod();
-				if (writeMethod != null) {
-					try {
-						writeMethod.invoke(getModel(), value);
-					} catch (Exception e) {
-						throw new RuntimeException(e);
-					}
-				}
-			}
+		for (String key : this.propertyMap.keySet()) {
+			Object value = this.propertyMap.get(key);
+			this.objectWrapper.setValue(key, value);
 		}
 	}
 }

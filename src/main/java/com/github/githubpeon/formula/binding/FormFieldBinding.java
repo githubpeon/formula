@@ -18,6 +18,7 @@ public abstract class FormFieldBinding<T extends Object> extends FormBinding<T> 
 		this.property = property;
 		this.required = required;
 
+		this.propertyMap.put(property, null);
 		propertyMap.addPropertyChangeListener(property, this);
 	}
 

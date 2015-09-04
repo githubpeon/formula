@@ -48,5 +48,12 @@
             </plugin>
         </plugins>
     </build>
+    <dependencies>
+      <dependency>
+          <groupId>org.minimalcode</groupId>
+          <artifactId>minimalcode-beans</artifactId>
+          <version>0.5.1</version><!-- or last version -->
+      </dependency>    
+    </dependencies>
 </project>
 
