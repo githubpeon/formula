@@ -12,9 +12,10 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.text.JTextComponent;
 
-import com.github.githubpeon.formula.annotation.CommitsForm;
+import com.github.githubpeon.formula.annotation.CommitForm;
 import com.github.githubpeon.formula.annotation.Form;
 import com.github.githubpeon.formula.annotation.FormField;
+import com.github.githubpeon.formula.annotation.RollbackForm;
 import com.github.githubpeon.formula.binding.AbstractFormBinder;
 import com.github.githubpeon.formula.binding.BindingException;
 import com.github.githubpeon.formula.binding.FormBinding;
@@ -72,13 +73,21 @@ public class SwingFormBinder extends AbstractFormBinder<Container> implements Fo
 						throw new BindingException(e.getClass().getName() + " when creating validator " + validatorClass.getName() + ".", e);
 					}
 					formBindings.add(formFieldBinding);
-				} else if (field.isAnnotationPresent(CommitsForm.class)) {
+				} else if (field.isAnnotationPresent(CommitForm.class)) {
 					field.setAccessible(true);
 					try {
 						JButton jButton = (JButton) field.get(container);
 						formBindings.add(new JButtonCommitBinding(jButton, this));
 					} catch (ClassCastException e) {
-						throw new BindingException("@CommitsForm annotation is only valid for JButton fields in binder " + getClass().getName() + ".");
+						throw new BindingException("@CommitForm annotation is only valid for JButton fields in binder " + getClass().getName() + ".");
+					}
+				} else if (field.isAnnotationPresent(RollbackForm.class)) {
+					field.setAccessible(true);
+					try {
+						JButton jButton = (JButton) field.get(container);
+						formBindings.add(new JButtonRollbackBinding(jButton, this));
+					} catch (ClassCastException e) {
+						throw new BindingException("@RollbackForm annotation is only valid for JButton fields in binder " + getClass().getName() + ".");
 					}
 				}
 			} catch (IllegalAccessException e) {

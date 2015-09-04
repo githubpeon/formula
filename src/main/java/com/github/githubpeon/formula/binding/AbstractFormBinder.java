@@ -1,8 +1,14 @@
 package com.github.githubpeon.formula.binding;
 
+import java.beans.BeanInfo;
+import java.beans.Introspector;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import com.github.githubpeon.formula.annotation.Form;
@@ -15,6 +21,7 @@ import com.github.githubpeon.formula.event.FormFieldFocusLostEvent;
 import com.github.githubpeon.formula.event.FormFieldListener;
 import com.github.githubpeon.formula.event.FormListener;
 import com.github.githubpeon.formula.event.FormPropertyEditedEvent;
+import com.github.githubpeon.formula.event.FormRolledBackEvent;
 import com.github.githubpeon.formula.event.FormValidationListener;
 import com.github.githubpeon.formula.validation.ValidationResult;
 import com.github.githubpeon.formula.validation.Validator;
@@ -25,19 +32,18 @@ public abstract class AbstractFormBinder<T extends Object> implements FormBinder
 	private final Set<FormFieldListener> formFieldListeners = new HashSet<FormFieldListener>();
 	private final Set<FormValidationListener> formValidationListeners = new HashSet<FormValidationListener>();
 	private final PropertyMap propertyMap = new PropertyMap();
+	private final Map<String, PropertyDescriptor> propertyDescriptors = new HashMap<String, PropertyDescriptor>();
 	private T form;
 	private Object model;
 	private Validator validator;
 
 	public AbstractFormBinder() {
 		propertyMap.addPropertyChangeListener(this);
-		propertyMap.put("username", "username");
-		propertyMap.put("password", "passwordD");
 	}
 
 	public AbstractFormBinder(Object model) {
 		this();
-		this.model = model;
+		setModel(model);
 	}
 
 	@Override
@@ -56,6 +62,20 @@ public abstract class AbstractFormBinder<T extends Object> implements FormBinder
 
 	public void setModel(Object model) {
 		this.model = model;
+		this.propertyDescriptors.clear();
+
+		try {
+			BeanInfo beanInfo = Introspector.getBeanInfo(getModel().getClass());
+			PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
+
+			for (int i = 0; i < propertyDescriptors.length; ++i) {
+				if (!propertyDescriptors[i].getName().equals("class")) {
+					this.propertyDescriptors.put(propertyDescriptors[i].getName(), propertyDescriptors[i]);
+				}
+			}
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public Validator getValidator() {
@@ -83,6 +103,8 @@ public abstract class AbstractFormBinder<T extends Object> implements FormBinder
 			Set<FormBinding> formBindings = bindFormFields(form);
 			validator.setFormBindings(formBindings);
 
+			init();
+
 			return formBindings;
 		} else {
 			throw new BindingException(form.getClass().getName() + " does not have a @Form annotation.");
@@ -104,7 +126,7 @@ public abstract class AbstractFormBinder<T extends Object> implements FormBinder
 
 	@Override
 	public void init() {
-
+		read();
 	}
 
 	@Override
@@ -122,14 +144,16 @@ public abstract class AbstractFormBinder<T extends Object> implements FormBinder
 		ValidationResult validationResult = validate();
 		fireFormValidationEvent(new FormCommitValidationEvent(this, validationResult));
 		if (!validationResult.hasErrors()) {
-			System.out.println("Commit: " + propertyMap);
+			System.out.println("Commit: " + propertyMap + " to " + getModel());
+			write();
 			fireFormEvent(new FormCommittedEvent(this));
 		}
 	}
 
 	@Override
 	public void rollback() {
-		System.out.println("Rollback");
+		read();
+		fireFormEvent(new FormRolledBackEvent(this));
 	}
 
 	@Override
@@ -182,6 +206,8 @@ public abstract class AbstractFormBinder<T extends Object> implements FormBinder
 				formListener.formPropertyEdited((FormPropertyEditedEvent) e);
 			} else if (e instanceof FormCommittedEvent) {
 				formListener.formCommitted((FormCommittedEvent) e);
+			} else if (e instanceof FormRolledBackEvent) {
+				formListener.formRolledBack((FormRolledBackEvent) e);
 			}
 		}
 	}
@@ -212,5 +238,35 @@ public abstract class AbstractFormBinder<T extends Object> implements FormBinder
 
 	protected PropertyMap getPropertyMap() {
 		return propertyMap;
+	}
+
+	private void read() {
+		for (PropertyDescriptor propertyDescriptor : this.propertyDescriptors.values()) {
+			Method readMethod = propertyDescriptor.getReadMethod();
+			try {
+				Object value = readMethod.invoke(getModel());
+				getPropertyMap().put(propertyDescriptor.getName(), value);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
+	private void write() {
+		for (String key : getPropertyMap().keySet()) {
+			Object value = getPropertyMap().get(key);
+
+			PropertyDescriptor propertyDescriptor = this.propertyDescriptors.get(key);
+			if (propertyDescriptor != null) {
+				Method writeMethod = propertyDescriptor.getWriteMethod();
+				if (writeMethod != null) {
+					try {
+						writeMethod.invoke(getModel(), value);
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				}
+			}
+		}
 	}
 }

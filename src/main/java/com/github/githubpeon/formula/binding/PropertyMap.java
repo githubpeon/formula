@@ -22,4 +22,9 @@ public class PropertyMap extends HashMap<String, Object> {
 	public void addPropertyChangeListener(PropertyChangeListener propertyChangeListener) {
 		propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);
 	}
+
+	public void addPropertyChangeListener(String property, PropertyChangeListener propertyChangeListener) {
+		propertyChangeSupport.addPropertyChangeListener(property, propertyChangeListener);
+	}
+
 }

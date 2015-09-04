@@ -16,8 +16,14 @@ public class JTextComponentBinding extends FormFieldBinding<JTextComponent> impl
 	}
 
 	@Override
-	public void read() {
-		getView().setText((String) getPropertyValue());
+	protected void doRead() {
+		getView().setText(String.valueOf(getPropertyValue()));
+		// SwingUtilities.invokeLater(new Runnable() {
+		// @Override
+		// public void run() {
+		// getView().setText((String) getPropertyValue());
+		// }
+		// });
 	}
 
 	@Override
@@ -34,4 +40,5 @@ public class JTextComponentBinding extends FormFieldBinding<JTextComponent> impl
 	public void changedUpdate(DocumentEvent e) {
 		// We don't care about this.
 	}
+
 }

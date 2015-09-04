@@ -6,4 +6,6 @@ public interface FormListener {
 
 	public void formCommitted(FormCommittedEvent e);
 
+	public void formRolledBack(FormRolledBackEvent e);
+
 }

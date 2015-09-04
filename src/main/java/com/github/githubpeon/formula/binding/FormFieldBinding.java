@@ -1,40 +1,36 @@
 package com.github.githubpeon.formula.binding;
 
-public abstract class FormFieldBinding<T extends Object> extends FormBinding<T> {
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
+public abstract class FormFieldBinding<T extends Object> extends FormBinding<T> implements PropertyChangeListener {
 
 	private String property;
 	private PropertyMap propertyMap;
 	private boolean required;
+
+	private boolean reading;
+	private boolean writing;
 
 	public FormFieldBinding(T view, FormBinder formBinder, PropertyMap propertyMap, String property, boolean required) {
 		super(view, formBinder);
 		this.propertyMap = propertyMap;
 		this.property = property;
 		this.required = required;
+
+		propertyMap.addPropertyChangeListener(property, this);
 	}
 
 	public PropertyMap getPropertyMap() {
 		return propertyMap;
 	}
 
-	public void setPropertyMap(PropertyMap propertyMap) {
-		this.propertyMap = propertyMap;
-	}
-
 	public String getProperty() {
 		return property;
 	}
 
-	public void setProperty(String property) {
-		this.property = property;
-	}
-
-	public Object getPropertyValue() {
+	protected Object getPropertyValue() {
 		return this.propertyMap.get(this.property);
-	}
-
-	public void setPropertyValue(Object value) {
-		this.propertyMap.put(this.property, value);
 	}
 
 	public boolean isRequired() {
@@ -56,9 +52,27 @@ public abstract class FormFieldBinding<T extends Object> extends FormBinding<T> 
 		return false;
 	}
 
-	public abstract void read();
-
-	public void write(Object value) {
-		setPropertyValue(value);
+	protected void read() {
+		if (!this.writing) {
+			this.reading = true;
+			doRead();
+			this.reading = false;
+		}
 	}
+
+	protected abstract void doRead();
+
+	protected void write(Object value) {
+		if (!this.reading) {
+			this.writing = true;
+			this.propertyMap.put(this.property, value);
+			this.writing = false;
+		}
+	}
+
+	@Override
+	public void propertyChange(PropertyChangeEvent e) {
+		read();
+	}
+
 }
