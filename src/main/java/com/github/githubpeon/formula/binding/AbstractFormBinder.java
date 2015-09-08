@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.minimalcode.beans.ObjectWrapper;
+import org.minimalcode.reflect.Bean;
+import org.minimalcode.reflect.Property;
 
 import com.github.githubpeon.formula.annotation.Form;
 import com.github.githubpeon.formula.event.FormCommitValidationEvent;
@@ -233,7 +235,19 @@ public abstract class AbstractFormBinder<T extends Object> implements FormBinder
 	private void write() {
 		for (String key : this.propertyMap.keySet()) {
 			Object value = this.propertyMap.get(key);
-			this.objectWrapper.setValue(key, value);
+			this.objectWrapper.setValue(key, convert(key, value));
 		}
 	}
+
+	private Object convert(String key, Object value) {
+		// Better (hopefully) implementation of this is expected in minimalcode-org upcoming versions.
+		Property property = Bean.forClass(getModel().getClass()).getProperty(key);
+		if (property != null
+				&& property.getType() == Integer.TYPE
+				&& value instanceof String) {
+			return Integer.valueOf((String) value);
+		}
+		return value;
+	}
+
 }
