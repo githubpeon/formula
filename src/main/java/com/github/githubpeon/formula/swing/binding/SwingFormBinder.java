@@ -9,6 +9,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.text.JTextComponent;
 
@@ -47,6 +49,10 @@ public class SwingFormBinder extends AbstractFormBinder<Container> implements Fo
 		}
 		if (formField instanceof JTextComponent) {
 			return new JTextComponentBinding((JTextComponent) formField, this, getPropertyMap(), property, required);
+		} else if (formField instanceof JComboBox) {
+			return new JComboBoxBinding((JComboBox) formField, this, getPropertyMap(), property, required);
+		} else if (formField instanceof JCheckBox) {
+			return new JCheckBoxBinding((JCheckBox) formField, this, getPropertyMap(), property, required);
 		}
 		throw new BindingException("Binding for class " + formField.getClass().getName() + " is not implemented in binder " + getClass().getName());
 	}
