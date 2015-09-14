@@ -5,6 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import com.github.githubpeon.formula.converter.DefaultConverter;
 import com.github.githubpeon.formula.validation.DefaultFieldValidator;
 
 @Retention(RetentionPolicy.RUNTIME)
@@ -16,5 +17,7 @@ public @interface FormField {
 	boolean required() default false;
 
 	Class validator() default DefaultFieldValidator.class;
+
+	Class converter() default DefaultConverter.class;
 
 }

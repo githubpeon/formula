@@ -22,6 +22,7 @@ import com.github.githubpeon.formula.binding.AbstractFormBinder;
 import com.github.githubpeon.formula.binding.BindingException;
 import com.github.githubpeon.formula.binding.FormBinding;
 import com.github.githubpeon.formula.binding.FormFieldBinding;
+import com.github.githubpeon.formula.converter.Converter;
 import com.github.githubpeon.formula.event.FormFieldFocusGainedEvent;
 import com.github.githubpeon.formula.event.FormFieldFocusLostEvent;
 import com.github.githubpeon.formula.validation.FieldValidator;
@@ -43,16 +44,16 @@ public class SwingFormBinder extends AbstractFormBinder<Container> implements Fo
 	}
 
 	@Override
-	protected FormFieldBinding bindFormField(Object formField, String property, boolean required) {
+	protected FormFieldBinding bindFormField(Object formField, String property, boolean required, Converter converter) {
 		if (formField instanceof JComponent) {
 			((JComponent) formField).addFocusListener(this);
 		}
 		if (formField instanceof JTextComponent) {
-			return new JTextComponentBinding((JTextComponent) formField, this, getPropertyMap(), property, required);
+			return new JTextComponentBinding((JTextComponent) formField, this, getPropertyMap(), property, required, converter);
 		} else if (formField instanceof JComboBox) {
-			return new JComboBoxBinding((JComboBox) formField, this, getPropertyMap(), property, required);
+			return new JComboBoxBinding((JComboBox) formField, this, getPropertyMap(), property, required, converter);
 		} else if (formField instanceof JCheckBox) {
-			return new JCheckBoxBinding((JCheckBox) formField, this, getPropertyMap(), property, required);
+			return new JCheckBoxBinding((JCheckBox) formField, this, getPropertyMap(), property, required, converter);
 		}
 		throw new BindingException("Binding for class " + formField.getClass().getName() + " is not implemented in binder " + getClass().getName());
 	}
@@ -68,7 +69,16 @@ public class SwingFormBinder extends AbstractFormBinder<Container> implements Fo
 
 					String property = formFieldAnnotation.value();
 					boolean required = formFieldAnnotation.required();
-					FormFieldBinding formFieldBinding = bindFormField(formField, property, required);
+					Converter converter = null;
+					Class converterClass = formFieldAnnotation.converter();
+					try {
+						converter = (Converter) converterClass.newInstance();
+						addConverter(property, converter);
+					} catch (Exception e) {
+						throw new BindingException(e.getClass().getName() + " when creating converter " + converterClass.getName() + ".", e);
+					}
+
+					FormFieldBinding formFieldBinding = bindFormField(formField, property, required, converter);
 
 					Class validatorClass = formFieldAnnotation.validator();
 					try {

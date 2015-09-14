@@ -3,20 +3,24 @@ package com.github.githubpeon.formula.binding;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import com.github.githubpeon.formula.converter.Converter;
+
 public abstract class FormFieldBinding<T extends Object> extends FormBinding<T> implements PropertyChangeListener {
 
 	private String property;
 	private PropertyMap propertyMap;
 	private boolean required;
+	private Converter converter;
 
 	private boolean reading;
 	private boolean writing;
 
-	public FormFieldBinding(T view, FormBinder formBinder, PropertyMap propertyMap, String property, boolean required) {
+	public FormFieldBinding(T view, FormBinder formBinder, PropertyMap propertyMap, String property, boolean required, Converter converter) {
 		super(view, formBinder);
 		this.propertyMap = propertyMap;
 		this.property = property;
 		this.required = required;
+		this.converter = converter;
 
 		this.propertyMap.put(property, null);
 		propertyMap.addPropertyChangeListener(property, this);
@@ -31,7 +35,7 @@ public abstract class FormFieldBinding<T extends Object> extends FormBinding<T> 
 	}
 
 	protected Object getPropertyValue() {
-		return this.propertyMap.get(this.property);
+		return this.converter.convertFrom(this.propertyMap.get(this.property));
 	}
 
 	public boolean isRequired() {
@@ -40,6 +44,14 @@ public abstract class FormFieldBinding<T extends Object> extends FormBinding<T> 
 
 	public void setRequired(boolean required) {
 		this.required = required;
+	}
+
+	public Converter getConverter() {
+		return converter;
+	}
+
+	public void setConverter(Converter converter) {
+		this.converter = converter;
 	}
 
 	public boolean isEmpty() {

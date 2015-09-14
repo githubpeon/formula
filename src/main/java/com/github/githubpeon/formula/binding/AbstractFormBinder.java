@@ -2,14 +2,15 @@ package com.github.githubpeon.formula.binding;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.minimalcode.beans.ObjectWrapper;
-import org.minimalcode.reflect.Bean;
-import org.minimalcode.reflect.Property;
 
 import com.github.githubpeon.formula.annotation.Form;
+import com.github.githubpeon.formula.converter.Converter;
 import com.github.githubpeon.formula.event.FormCommitValidationEvent;
 import com.github.githubpeon.formula.event.FormCommittedEvent;
 import com.github.githubpeon.formula.event.FormEditValidationEvent;
@@ -21,6 +22,7 @@ import com.github.githubpeon.formula.event.FormListener;
 import com.github.githubpeon.formula.event.FormPropertyEditedEvent;
 import com.github.githubpeon.formula.event.FormRolledBackEvent;
 import com.github.githubpeon.formula.event.FormValidationListener;
+import com.github.githubpeon.formula.validation.ValidationMessage;
 import com.github.githubpeon.formula.validation.ValidationResult;
 import com.github.githubpeon.formula.validation.Validator;
 
@@ -33,6 +35,7 @@ public abstract class AbstractFormBinder<T extends Object> implements FormBinder
 	private T form;
 	private Object model;
 	private Validator validator;
+	private final Map<String, Converter> converters = new HashMap<String, Converter>();
 	private ObjectWrapper objectWrapper;
 
 	public AbstractFormBinder() {
@@ -71,6 +74,10 @@ public abstract class AbstractFormBinder<T extends Object> implements FormBinder
 		this.validator = validator;
 	}
 
+	protected void addConverter(String property, Converter converter) {
+		this.converters.put(property, converter);
+	}
+
 	@Override
 	public Set<FormBinding> bindForm(T form) {
 		if (form.getClass().isAnnotationPresent(Form.class)) {
@@ -98,7 +105,7 @@ public abstract class AbstractFormBinder<T extends Object> implements FormBinder
 
 	protected abstract Set<FormBinding> bindFormFields(T form);
 
-	protected abstract FormFieldBinding bindFormField(Object formField, String property, boolean required);
+	protected abstract FormFieldBinding bindFormField(Object formField, String property, boolean required, Converter converter);
 
 	@Override
 	public void propertyChange(PropertyChangeEvent e) {
@@ -132,6 +139,15 @@ public abstract class AbstractFormBinder<T extends Object> implements FormBinder
 			write();
 			System.out.println("Commit: " + propertyMap + " to " + getModel());
 			fireFormEvent(new FormCommittedEvent(this));
+		} else {
+			// TODO: Remove this
+			for (ValidationMessage message : validationResult.getFormValidationMessages()) {
+				System.out.println(message);
+			}
+			for (String key : validationResult.getPropertyValidationMessages().keySet()) {
+				System.out.println(key + ": " + validationResult.getPropertyValidationMessage(key));
+			}
+
 		}
 	}
 
@@ -235,19 +251,9 @@ public abstract class AbstractFormBinder<T extends Object> implements FormBinder
 	private void write() {
 		for (String key : this.propertyMap.keySet()) {
 			Object value = this.propertyMap.get(key);
-			this.objectWrapper.setValue(key, convert(key, value));
+			Converter converter = this.converters.get(key);
+			this.objectWrapper.setValue(key, converter.convertTo(value));
 		}
-	}
-
-	private Object convert(String key, Object value) {
-		// Better (hopefully) implementation of this is expected in minimalcode-org upcoming versions.
-		Property property = Bean.forClass(getModel().getClass()).getProperty(key);
-		if (property != null
-				&& property.getType() == Integer.TYPE
-				&& value instanceof String) {
-			return Integer.valueOf((String) value);
-		}
-		return value;
 	}
 
 }
