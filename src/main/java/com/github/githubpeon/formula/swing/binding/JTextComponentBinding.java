@@ -7,12 +7,11 @@ import javax.swing.text.JTextComponent;
 import com.github.githubpeon.formula.binding.FormBinder;
 import com.github.githubpeon.formula.binding.FormFieldBinding;
 import com.github.githubpeon.formula.binding.PropertyMap;
-import com.github.githubpeon.formula.converter.Converter;
 
 public class JTextComponentBinding extends FormFieldBinding<JTextComponent> implements DocumentListener {
 
-	public JTextComponentBinding(JTextComponent jTextComponent, FormBinder formBinder, PropertyMap propertyMap, String property, boolean required, Converter converter) {
-		super(jTextComponent, formBinder, propertyMap, property, required, converter);
+	public JTextComponentBinding(JTextComponent jTextComponent, FormBinder formBinder, PropertyMap propertyMap, String property, boolean required) {
+		super(jTextComponent, formBinder, propertyMap, property, required);
 		jTextComponent.getDocument().addDocumentListener(this);
 	}
 

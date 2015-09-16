@@ -8,12 +8,11 @@ import javax.swing.JCheckBox;
 import com.github.githubpeon.formula.binding.FormBinder;
 import com.github.githubpeon.formula.binding.FormFieldBinding;
 import com.github.githubpeon.formula.binding.PropertyMap;
-import com.github.githubpeon.formula.converter.Converter;
 
 public class JCheckBoxBinding extends FormFieldBinding<JCheckBox> implements ActionListener {
 
-	public JCheckBoxBinding(JCheckBox jCheckBox, FormBinder formBinder, PropertyMap propertyMap, String property, boolean required, Converter converter) {
-		super(jCheckBox, formBinder, propertyMap, property, required, converter);
+	public JCheckBoxBinding(JCheckBox jCheckBox, FormBinder formBinder, PropertyMap propertyMap, String property, boolean required) {
+		super(jCheckBox, formBinder, propertyMap, property, required);
 		jCheckBox.addActionListener(this);
 	}
 

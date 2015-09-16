@@ -105,7 +105,7 @@ public abstract class AbstractFormBinder<T extends Object> implements FormBinder
 
 	protected abstract Set<FormBinding> bindFormFields(T form);
 
-	protected abstract FormFieldBinding bindFormField(Object formField, String property, boolean required, Converter converter);
+	protected abstract FormFieldBinding bindFormField(Object formField, String property, boolean required);
 
 	@Override
 	public void propertyChange(PropertyChangeEvent e) {
@@ -244,7 +244,8 @@ public abstract class AbstractFormBinder<T extends Object> implements FormBinder
 	private void read() {
 		for (String key : this.propertyMap.keySet()) {
 			Object value = this.objectWrapper.getValue(key);
-			this.propertyMap.put(key, value);
+			Converter converter = this.converters.get(key);
+			this.propertyMap.put(key, converter.convertFrom(value));
 		}
 	}
 
