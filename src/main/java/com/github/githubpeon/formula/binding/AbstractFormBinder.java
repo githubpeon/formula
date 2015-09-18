@@ -2,6 +2,7 @@ package com.github.githubpeon.formula.binding;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -10,6 +11,7 @@ import java.util.Set;
 import org.minimalcode.beans.ObjectWrapper;
 
 import com.github.githubpeon.formula.annotation.Form;
+import com.github.githubpeon.formula.annotation.FormField;
 import com.github.githubpeon.formula.converter.Converter;
 import com.github.githubpeon.formula.event.FormCommitValidationEvent;
 import com.github.githubpeon.formula.event.FormCommittedEvent;
@@ -22,6 +24,7 @@ import com.github.githubpeon.formula.event.FormListener;
 import com.github.githubpeon.formula.event.FormPropertyEditedEvent;
 import com.github.githubpeon.formula.event.FormRolledBackEvent;
 import com.github.githubpeon.formula.event.FormValidationListener;
+import com.github.githubpeon.formula.validation.FieldValidator;
 import com.github.githubpeon.formula.validation.ValidationMessage;
 import com.github.githubpeon.formula.validation.ValidationResult;
 import com.github.githubpeon.formula.validation.Validator;
@@ -104,6 +107,40 @@ public abstract class AbstractFormBinder<T extends Object> implements FormBinder
 	}
 
 	protected abstract Set<FormBinding> bindFormFields(T form);
+
+	protected FormFieldBinding bindFormField(Field field, Object container) {
+		try {
+			field.setAccessible(true);
+			Object formField = field.get(container);
+			FormField formFieldAnnotation = field.getAnnotation(FormField.class);
+
+			String property = formFieldAnnotation.value();
+			boolean required = formFieldAnnotation.required();
+			Converter converter = null;
+			Class converterClass = formFieldAnnotation.converter();
+			try {
+				converter = (Converter) converterClass.newInstance();
+				addConverter(property, converter);
+			} catch (Exception e) {
+				throw new BindingException(e.getClass().getName() + " when creating converter " + converterClass.getName() + ".", e);
+			}
+
+			FormFieldBinding formFieldBinding = bindFormField(formField, property, required);
+
+			Class validatorClass = formFieldAnnotation.validator();
+			try {
+				FieldValidator fieldValidator = (FieldValidator) validatorClass.newInstance();
+				fieldValidator.setFormFieldBinding(formFieldBinding);
+				getValidator().addFieldValidator(fieldValidator);
+			} catch (Exception e) {
+				throw new BindingException(e.getClass().getName() + " when creating validator " + validatorClass.getName() + ".", e);
+			}
+
+			return formFieldBinding;
+		} catch (IllegalAccessException e) {
+			throw new BindingException(e.getClass().getName() + " when creating binding for field " + field + ".", e);
+		}
+	}
 
 	protected abstract FormFieldBinding bindFormField(Object formField, String property, boolean required);
 

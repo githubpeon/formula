@@ -23,10 +23,8 @@ import com.github.githubpeon.formula.binding.AbstractFormBinder;
 import com.github.githubpeon.formula.binding.BindingException;
 import com.github.githubpeon.formula.binding.FormBinding;
 import com.github.githubpeon.formula.binding.FormFieldBinding;
-import com.github.githubpeon.formula.converter.Converter;
 import com.github.githubpeon.formula.event.FormFieldFocusGainedEvent;
 import com.github.githubpeon.formula.event.FormFieldFocusLostEvent;
-import com.github.githubpeon.formula.validation.FieldValidator;
 
 public class SwingFormBinder extends AbstractFormBinder<Container> implements FocusListener {
 
@@ -66,31 +64,7 @@ public class SwingFormBinder extends AbstractFormBinder<Container> implements Fo
 		for (Field field : container.getClass().getDeclaredFields()) {
 			try {
 				if (field.isAnnotationPresent(FormField.class)) {
-					field.setAccessible(true);
-					JComponent formField = (JComponent) field.get(container);
-					FormField formFieldAnnotation = field.getAnnotation(FormField.class);
-
-					String property = formFieldAnnotation.value();
-					boolean required = formFieldAnnotation.required();
-					Converter converter = null;
-					Class converterClass = formFieldAnnotation.converter();
-					try {
-						converter = (Converter) converterClass.newInstance();
-						addConverter(property, converter);
-					} catch (Exception e) {
-						throw new BindingException(e.getClass().getName() + " when creating converter " + converterClass.getName() + ".", e);
-					}
-
-					FormFieldBinding formFieldBinding = bindFormField(formField, property, required);
-
-					Class validatorClass = formFieldAnnotation.validator();
-					try {
-						FieldValidator fieldValidator = (FieldValidator) validatorClass.newInstance();
-						fieldValidator.setFormFieldBinding(formFieldBinding);
-						getValidator().addFieldValidator(fieldValidator);
-					} catch (Exception e) {
-						throw new BindingException(e.getClass().getName() + " when creating validator " + validatorClass.getName() + ".", e);
-					}
+					FormFieldBinding formFieldBinding = bindFormField(field, container);
 					formBindings.add(formFieldBinding);
 				} else if (field.isAnnotationPresent(CommitForm.class)) {
 					field.setAccessible(true);
