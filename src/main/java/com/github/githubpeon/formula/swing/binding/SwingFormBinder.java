@@ -12,6 +12,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JList;
 import javax.swing.JRadioButton;
 import javax.swing.text.JTextComponent;
 
@@ -55,6 +56,8 @@ public class SwingFormBinder extends AbstractFormBinder<Container> implements Fo
 			return new JCheckBoxBinding((JCheckBox) formField, this, getPropertyMap(), property, required);
 		} else if (formField instanceof JRadioButton) {
 			return new JRadioButtonBinding((JRadioButton) formField, this, getPropertyMap(), property, required);
+		} else if (formField instanceof JList) {
+			return new JListBinding((JList) formField, this, getPropertyMap(), property, required);
 		}
 		throw new BindingException("Binding for class " + formField.getClass().getName() + " is not implemented in binder " + getClass().getName());
 	}
