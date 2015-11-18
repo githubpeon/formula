@@ -114,7 +114,7 @@ public abstract class AbstractFormBinder<T extends Object> implements FormBinder
 			Object formField = field.get(container);
 			FormField formFieldAnnotation = field.getAnnotation(FormField.class);
 
-			String property = formFieldAnnotation.value();
+			String property = formFieldAnnotation.property();
 			boolean required = formFieldAnnotation.required();
 			Converter converter = null;
 			Class converterClass = formFieldAnnotation.converter();

@@ -12,7 +12,7 @@ import com.github.githubpeon.formula.validation.DefaultFieldValidator;
 @Target(ElementType.FIELD)
 public @interface FormField {
 
-	String value();
+	String property();
 
 	boolean required() default false;
 
