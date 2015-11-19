@@ -20,6 +20,7 @@ import com.github.githubpeon.formula.event.FormEvent;
 import com.github.githubpeon.formula.event.FormFieldFocusGainedEvent;
 import com.github.githubpeon.formula.event.FormFieldFocusLostEvent;
 import com.github.githubpeon.formula.event.FormFieldListener;
+import com.github.githubpeon.formula.event.FormInitializedEvent;
 import com.github.githubpeon.formula.event.FormListener;
 import com.github.githubpeon.formula.event.FormPropertyEditedEvent;
 import com.github.githubpeon.formula.event.FormRolledBackEvent;
@@ -156,6 +157,7 @@ public abstract class AbstractFormBinder<T extends Object> implements FormBinder
 	@Override
 	public void init() {
 		read();
+		fireFormEvent(new FormInitializedEvent(this));
 	}
 
 	@Override
@@ -242,6 +244,8 @@ public abstract class AbstractFormBinder<T extends Object> implements FormBinder
 			FormListener formListener = (FormListener) listener;
 			if (e instanceof FormPropertyEditedEvent) {
 				formListener.formPropertyEdited((FormPropertyEditedEvent) e);
+			} else if (e instanceof FormInitializedEvent) {
+				formListener.formInitialized((FormInitializedEvent) e);
 			} else if (e instanceof FormCommittedEvent) {
 				formListener.formCommitted((FormCommittedEvent) e);
 			} else if (e instanceof FormRolledBackEvent) {

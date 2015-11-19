@@ -8,6 +8,7 @@ import javax.swing.JButton;
 import com.github.githubpeon.formula.binding.FormBinder;
 import com.github.githubpeon.formula.binding.FormBinding;
 import com.github.githubpeon.formula.event.FormCommittedEvent;
+import com.github.githubpeon.formula.event.FormInitializedEvent;
 import com.github.githubpeon.formula.event.FormListener;
 import com.github.githubpeon.formula.event.FormPropertyEditedEvent;
 import com.github.githubpeon.formula.event.FormRolledBackEvent;
@@ -29,6 +30,11 @@ public class JButtonRollbackBinding extends FormBinding<JButton> implements Acti
 	@Override
 	public void formPropertyEdited(FormPropertyEditedEvent e) {
 		getView().setEnabled(true);
+	}
+
+	@Override
+	public void formInitialized(FormInitializedEvent e) {
+		getView().setEnabled(false);
 	}
 
 	@Override
