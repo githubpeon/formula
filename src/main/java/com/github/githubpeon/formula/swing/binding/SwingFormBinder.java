@@ -12,8 +12,10 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JRadioButton;
+import javax.swing.JSlider;
 import javax.swing.text.JTextComponent;
 
 import com.github.githubpeon.formula.annotation.CommitForm;
@@ -48,7 +50,9 @@ public class SwingFormBinder extends AbstractFormBinder<Container> implements Fo
 		if (formField instanceof JComponent) {
 			((JComponent) formField).addFocusListener(this);
 		}
-		if (formField instanceof JTextComponent) {
+		if (formField instanceof JLabel) {
+			return new JLabelBinding((JLabel) formField, this, getPropertyMap(), property, required);
+		} else if (formField instanceof JTextComponent) {
 			return new JTextComponentBinding((JTextComponent) formField, this, getPropertyMap(), property, required);
 		} else if (formField instanceof JComboBox) {
 			return new JComboBoxBinding((JComboBox) formField, this, getPropertyMap(), property, required);
@@ -58,6 +62,8 @@ public class SwingFormBinder extends AbstractFormBinder<Container> implements Fo
 			return new JRadioButtonBinding((JRadioButton) formField, this, getPropertyMap(), property, required);
 		} else if (formField instanceof JList) {
 			return new JListBinding((JList) formField, this, getPropertyMap(), property, required);
+		} else if (formField instanceof JSlider) {
+			return new JSliderBinding((JSlider) formField, this, getPropertyMap(), property, required);
 		}
 		throw new BindingException("Binding for class " + formField.getClass().getName() + " is not implemented in binder " + getClass().getName());
 	}
