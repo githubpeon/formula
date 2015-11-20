@@ -14,8 +14,10 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
 import javax.swing.JSlider;
+import javax.swing.JSpinner;
 import javax.swing.text.JTextComponent;
 
 import com.github.githubpeon.formula.annotation.CommitForm;
@@ -64,6 +66,10 @@ public class SwingFormBinder extends AbstractFormBinder<Container> implements Fo
 			return new JListBinding((JList) formField, this, getPropertyMap(), property, required);
 		} else if (formField instanceof JSlider) {
 			return new JSliderBinding((JSlider) formField, this, getPropertyMap(), property, required);
+		} else if (formField instanceof JSpinner) {
+			return new JSpinnerBinding((JSpinner) formField, this, getPropertyMap(), property, required);
+		} else if (formField instanceof JProgressBar) {
+			return new JProgressBarBinding((JProgressBar) formField, this, getPropertyMap(), property, required);
 		}
 		throw new BindingException("Binding for class " + formField.getClass().getName() + " is not implemented in binder " + getClass().getName());
 	}
