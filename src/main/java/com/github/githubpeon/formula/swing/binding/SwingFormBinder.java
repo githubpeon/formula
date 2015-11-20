@@ -10,6 +10,7 @@ import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -66,6 +67,8 @@ public class SwingFormBinder extends AbstractFormBinder implements FocusListener
 			return new JSpinnerBinding((JSpinner) formField, this, getPropertyMap(), property, required);
 		} else if (formField instanceof JProgressBar) {
 			return new JProgressBarBinding((JProgressBar) formField, this, getPropertyMap(), property, required);
+		} else if (formField instanceof JColorChooser) {
+			return new JColorChooserBinding((JColorChooser) formField, this, getPropertyMap(), property, required);
 		}
 		throw new BindingException("Binding for class " + formField.getClass().getName() + " is not implemented in binder " + getClass().getName());
 	}
