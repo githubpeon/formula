@@ -17,6 +17,7 @@ import com.github.githubpeon.formula.event.FormFieldListener;
 import com.github.githubpeon.formula.event.FormInitializedEvent;
 import com.github.githubpeon.formula.event.FormListener;
 import com.github.githubpeon.formula.event.FormPropertyEditedEvent;
+import com.github.githubpeon.formula.event.FormRefreshedEvent;
 import com.github.githubpeon.formula.event.FormRolledBackEvent;
 import com.github.githubpeon.formula.event.FormValidationListener;
 import com.github.githubpeon.formula.validation.ValidationResult;
@@ -44,6 +45,11 @@ public class JButtonCommitBinding extends FormBinding<JButton> implements Action
 
 	@Override
 	public void formInitialized(FormInitializedEvent e) {
+		getView().setEnabled(false);
+	}
+
+	@Override
+	public void formRefreshed(FormRefreshedEvent e) {
 		getView().setEnabled(false);
 	}
 

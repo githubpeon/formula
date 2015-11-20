@@ -31,19 +31,15 @@ import com.github.githubpeon.formula.binding.FormFieldBinding;
 import com.github.githubpeon.formula.event.FormFieldFocusGainedEvent;
 import com.github.githubpeon.formula.event.FormFieldFocusLostEvent;
 
-public class SwingFormBinder extends AbstractFormBinder<Container> implements FocusListener {
+public class SwingFormBinder extends AbstractFormBinder implements FocusListener {
 
-	public SwingFormBinder() {
-		super();
-	}
-
-	public SwingFormBinder(Object model) {
-		super(model);
+	public SwingFormBinder(Container form) {
+		super(form);
 	}
 
 	@Override
-	protected Set<FormBinding> bindFormFields(Container form) {
-		Set<FormBinding> formBindings = bindContainer(form);
+	protected Set<FormBinding> bindFormFields() {
+		Set<FormBinding> formBindings = bindContainer((Container) getForm());
 		return formBindings;
 	}
 

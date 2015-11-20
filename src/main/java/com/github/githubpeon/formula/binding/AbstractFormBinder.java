@@ -23,6 +23,7 @@ import com.github.githubpeon.formula.event.FormFieldListener;
 import com.github.githubpeon.formula.event.FormInitializedEvent;
 import com.github.githubpeon.formula.event.FormListener;
 import com.github.githubpeon.formula.event.FormPropertyEditedEvent;
+import com.github.githubpeon.formula.event.FormRefreshedEvent;
 import com.github.githubpeon.formula.event.FormRolledBackEvent;
 import com.github.githubpeon.formula.event.FormValidationListener;
 import com.github.githubpeon.formula.validation.FieldValidator;
@@ -30,44 +31,46 @@ import com.github.githubpeon.formula.validation.ValidationMessage;
 import com.github.githubpeon.formula.validation.ValidationResult;
 import com.github.githubpeon.formula.validation.Validator;
 
-public abstract class AbstractFormBinder<T extends Object> implements FormBinder<T>, PropertyChangeListener {
+public abstract class AbstractFormBinder implements FormBinder, PropertyChangeListener {
 
 	private final Set<FormListener> formListeners = new HashSet<FormListener>();
 	private final Set<FormFieldListener> formFieldListeners = new HashSet<FormFieldListener>();
 	private final Set<FormValidationListener> formValidationListeners = new HashSet<FormValidationListener>();
 	private final PropertyMap propertyMap = new PropertyMap();
-	private T form;
+	private final Object form;
 	private Object model;
 	private Validator validator;
 	private final Map<String, Converter> converters = new HashMap<String, Converter>();
 	private ObjectWrapper objectWrapper;
 
-	public AbstractFormBinder() {
-		propertyMap.addPropertyChangeListener(this);
-	}
-
-	public AbstractFormBinder(Object model) {
-		this();
-		setModel(model);
-	}
-
-	@Override
-	public T getForm() {
-		return form;
-	}
-
-	public void setForm(T form) {
+	public AbstractFormBinder(Object form) {
+		if (!form.getClass().isAnnotationPresent(Form.class)) {
+			throw new BindingException(form.getClass().getName() + " does not have a @Form annotation.");
+		}
 		this.form = form;
+		propertyMap.addPropertyChangeListener(this);
+		bindForm();
 	}
 
-	@Override
-	public Object getModel() {
+	protected Object getForm() {
+		return this.form;
+	}
+
+	protected Object getModel() {
 		return model;
 	}
 
+	@Override
 	public void setModel(Object model) {
-		this.model = model;
 		this.objectWrapper = new ObjectWrapper(model);
+		this.model = model;
+		init();
+	}
+
+	@Override
+	public void refresh() {
+		read();
+		fireFormEvent(new FormRefreshedEvent(this));
 	}
 
 	public Validator getValidator() {
@@ -82,32 +85,23 @@ public abstract class AbstractFormBinder<T extends Object> implements FormBinder
 		this.converters.put(property, converter);
 	}
 
-	@Override
-	public Set<FormBinding> bindForm(T form) {
-		if (form.getClass().isAnnotationPresent(Form.class)) {
-			setForm(form);
-
-			Form formAnnotation = form.getClass().getAnnotation(Form.class);
-			Class validatorClass = formAnnotation.validator();
-			try {
-				Validator validator = (Validator) validatorClass.newInstance();
-				setValidator(validator);
-			} catch (Exception e) {
-				throw new BindingException(e.getClass().getName() + " when creating validator " + validatorClass.getName() + ".", e);
-			}
-
-			Set<FormBinding> formBindings = bindFormFields(form);
-			validator.setFormBindings(formBindings);
-
-			init();
-
-			return formBindings;
-		} else {
-			throw new BindingException(form.getClass().getName() + " does not have a @Form annotation.");
+	protected Set<FormBinding> bindForm() {
+		Form formAnnotation = this.form.getClass().getAnnotation(Form.class);
+		Class validatorClass = formAnnotation.validator();
+		try {
+			Validator validator = (Validator) validatorClass.newInstance();
+			setValidator(validator);
+		} catch (Exception e) {
+			throw new BindingException(e.getClass().getName() + " when creating validator " + validatorClass.getName() + ".", e);
 		}
+
+		Set<FormBinding> formBindings = bindFormFields();
+		validator.setFormBindings(formBindings);
+
+		return formBindings;
 	}
 
-	protected abstract Set<FormBinding> bindFormFields(T form);
+	protected abstract Set<FormBinding> bindFormFields();
 
 	protected FormFieldBinding bindFormField(Field field, Object container) {
 		try {
@@ -154,14 +148,12 @@ public abstract class AbstractFormBinder<T extends Object> implements FormBinder
 		}
 	}
 
-	@Override
-	public void init() {
+	protected void init() {
 		read();
 		fireFormEvent(new FormInitializedEvent(this));
 	}
 
-	@Override
-	public ValidationResult validate() {
+	protected ValidationResult validate() {
 		if (getValidator() != null) {
 			ValidationResult validationResult = getValidator().validate(this.propertyMap);
 			return validationResult;
@@ -246,6 +238,8 @@ public abstract class AbstractFormBinder<T extends Object> implements FormBinder
 				formListener.formPropertyEdited((FormPropertyEditedEvent) e);
 			} else if (e instanceof FormInitializedEvent) {
 				formListener.formInitialized((FormInitializedEvent) e);
+			} else if (e instanceof FormRefreshedEvent) {
+				formListener.formRefreshed((FormRefreshedEvent) e);
 			} else if (e instanceof FormCommittedEvent) {
 				formListener.formCommitted((FormCommittedEvent) e);
 			} else if (e instanceof FormRolledBackEvent) {

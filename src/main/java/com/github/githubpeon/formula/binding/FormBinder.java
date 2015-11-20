@@ -1,23 +1,14 @@
 package com.github.githubpeon.formula.binding;
 
-import java.util.Set;
-
 import com.github.githubpeon.formula.event.FormFieldListener;
 import com.github.githubpeon.formula.event.FormListener;
 import com.github.githubpeon.formula.event.FormValidationListener;
-import com.github.githubpeon.formula.validation.ValidationResult;
 
-public interface FormBinder<T extends Object> {
+public interface FormBinder {
 
-	public T getForm();
+	public void setModel(Object model);
 
-	public Object getModel();
-
-	public Set<FormBinding> bindForm(T form);
-
-	public void init();
-
-	public ValidationResult validate();
+	public void refresh();
 
 	public void commit();
 

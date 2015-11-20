@@ -11,6 +11,7 @@ import com.github.githubpeon.formula.event.FormCommittedEvent;
 import com.github.githubpeon.formula.event.FormInitializedEvent;
 import com.github.githubpeon.formula.event.FormListener;
 import com.github.githubpeon.formula.event.FormPropertyEditedEvent;
+import com.github.githubpeon.formula.event.FormRefreshedEvent;
 import com.github.githubpeon.formula.event.FormRolledBackEvent;
 
 public class JButtonRollbackBinding extends FormBinding<JButton> implements ActionListener, FormListener {
@@ -34,6 +35,11 @@ public class JButtonRollbackBinding extends FormBinding<JButton> implements Acti
 
 	@Override
 	public void formInitialized(FormInitializedEvent e) {
+		getView().setEnabled(false);
+	}
+
+	@Override
+	public void formRefreshed(FormRefreshedEvent e) {
 		getView().setEnabled(false);
 	}
 
