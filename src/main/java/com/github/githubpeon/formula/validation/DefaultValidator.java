@@ -8,7 +8,7 @@ import com.github.githubpeon.formula.binding.FormBinding;
 
 public class DefaultValidator<T extends Map> implements Validator<T> {
 
-	private final Set<FieldValidator> fieldValidators = new HashSet<FieldValidator>();
+	private final Set<FieldValidator<T>> fieldValidators = new HashSet<FieldValidator<T>>();
 	private Set<FormBinding> formBindings = new HashSet<FormBinding>();
 
 	public DefaultValidator() {
@@ -18,12 +18,12 @@ public class DefaultValidator<T extends Map> implements Validator<T> {
 		this.formBindings = formBindings;
 	}
 
-	public Set<FieldValidator> getFieldValidators() {
+	public Set<FieldValidator<T>> getFieldValidators() {
 		return fieldValidators;
 	}
 
 	@Override
-	public void addFieldValidator(FieldValidator fieldValidator) {
+	public void addFieldValidator(FieldValidator<T> fieldValidator) {
 		fieldValidators.add(fieldValidator);
 	}
 
@@ -46,7 +46,7 @@ public class DefaultValidator<T extends Map> implements Validator<T> {
 	}
 
 	protected ValidationResult validateFields(T model, ValidationResult validationResult) {
-		for (FieldValidator fieldValidator : fieldValidators) {
+		for (FieldValidator<T> fieldValidator : fieldValidators) {
 			ValidationResult fieldValidationResult = fieldValidator.validate(model);
 			validationResult.getPropertyValidationMessages().putAll(fieldValidationResult.getPropertyValidationMessages());
 		}

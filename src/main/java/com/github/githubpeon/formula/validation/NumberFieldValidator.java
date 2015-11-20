@@ -2,14 +2,14 @@ package com.github.githubpeon.formula.validation;
 
 import java.util.Map;
 
-public class NumberFieldValidator extends DefaultFieldValidator {
+public class NumberFieldValidator extends DefaultFieldValidator<Map<String, String>> {
 
 	@Override
-	public ValidationResult validate(Map model) {
+	public ValidationResult validate(Map<String, String> model) {
 		ValidationResult validationResult = super.validate(model);
 
 		try {
-			String value = (String) model.get(getFormFieldBinding().getProperty());
+			String value = model.get(getFormFieldBinding().getProperty());
 			if (value != null && !value.isEmpty()) {
 				Integer.parseInt(value);
 			}
