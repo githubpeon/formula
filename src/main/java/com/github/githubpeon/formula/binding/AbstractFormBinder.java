@@ -3,8 +3,12 @@ package com.github.githubpeon.formula.binding;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -41,7 +45,8 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 	private Object model;
 	private Validator validator;
 	private final Map<String, Converter> converters = new HashMap<String, Converter>();
-	private ObjectWrapper objectWrapper;
+	private final List<ObjectWrapper> objectWrappers = new ArrayList<ObjectWrapper>();
+	private final List<Object> containers = new ArrayList<Object>();
 
 	public AbstractFormBinder(Object form) {
 		if (!form.getClass().isAnnotationPresent(Form.class)) {
@@ -62,7 +67,14 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 
 	@Override
 	public void setModel(Object model) {
-		this.objectWrapper = new ObjectWrapper(model);
+		if (model instanceof Collection) {
+			Iterator iterator = ((Collection) model).iterator();
+			while (iterator.hasNext()) {
+				this.objectWrappers.add(new ObjectWrapper(iterator.next()));
+			}
+		} else {
+			this.objectWrappers.add(new ObjectWrapper(model));
+		}
 		this.model = model;
 		init();
 	}
@@ -110,6 +122,14 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 			FormField formFieldAnnotation = field.getAnnotation(FormField.class);
 
 			String property = formFieldAnnotation.property();
+			// We add the index of the container to the property key so we can have multiple copies of the same
+			// container in one and the same form. We're going to assume the model is an Iterable when
+			// we have multiple copies.
+			if (!containers.contains(container)) {
+				containers.add(container);
+			}
+			property += "." + containers.indexOf(container);
+
 			boolean required = formFieldAnnotation.required();
 			Converter converter = null;
 			Class converterClass = formFieldAnnotation.converter();
@@ -278,7 +298,12 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 
 	private void read() {
 		for (String key : this.propertyMap.keySet()) {
-			Object value = this.objectWrapper.getValue(key);
+			// We're assuming we have a key in the form of property.index, for example password.0,
+			// where the index corresponds to the index of the objectwrapper for the specific model
+			// object we're reading from.
+			int lastIndex = key.lastIndexOf(".");
+			int index = Integer.parseInt(key.substring(lastIndex + 1));
+			Object value = this.objectWrappers.get(index).getValue(key.substring(0, lastIndex));
 			Converter converter = this.converters.get(key);
 			this.propertyMap.put(key, converter.convertFrom(value));
 		}
@@ -286,9 +311,12 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 
 	private void write() {
 		for (String key : this.propertyMap.keySet()) {
+			// And we do the same thing when writing.
+			int lastIndex = key.lastIndexOf(".");
+			int index = Integer.parseInt(key.substring(lastIndex + 1));
 			Object value = this.propertyMap.get(key);
 			Converter converter = this.converters.get(key);
-			this.objectWrapper.setValue(key, converter.convertTo(value));
+			this.objectWrappers.get(index).setValue(key.substring(0, lastIndex), converter.convertTo(value));
 		}
 	}
 
