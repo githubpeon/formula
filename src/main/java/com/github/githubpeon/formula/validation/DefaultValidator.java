@@ -1,29 +1,37 @@
 package com.github.githubpeon.formula.validation;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.github.githubpeon.formula.binding.FormBinding;
 
-public class DefaultValidator<T extends Map> implements Validator<T> {
+public class DefaultValidator implements Validator {
 
-	private final Set<FieldValidator<T>> fieldValidators = new HashSet<FieldValidator<T>>();
+	private Object view;
+	private final List<FieldValidator> fieldValidators = new ArrayList<FieldValidator>();
 	private Set<FormBinding> formBindings = new HashSet<FormBinding>();
 
 	public DefaultValidator() {
 	}
 
-	public DefaultValidator(Set<FormBinding> formBindings) {
-		this.formBindings = formBindings;
+	public Object getView() {
+		return view;
 	}
 
-	public Set<FieldValidator<T>> getFieldValidators() {
+	@Override
+	public void setView(Object view) {
+		this.view = view;
+	}
+
+	public List<FieldValidator> getFieldValidators() {
 		return fieldValidators;
 	}
 
 	@Override
-	public void addFieldValidator(FieldValidator<T> fieldValidator) {
+	public void addFieldValidator(FieldValidator fieldValidator) {
 		fieldValidators.add(fieldValidator);
 	}
 
@@ -37,7 +45,7 @@ public class DefaultValidator<T extends Map> implements Validator<T> {
 	}
 
 	@Override
-	public ValidationResult validate(T model) {
+	public ValidationResult validate(Map<String, Object> model) {
 		ValidationResult validationResult = validateFields(model, new ValidationResult());
 		if (!validationResult.hasErrors()) {
 			validationResult = validateForm(model, validationResult);
@@ -45,15 +53,15 @@ public class DefaultValidator<T extends Map> implements Validator<T> {
 		return validationResult;
 	}
 
-	protected ValidationResult validateFields(T model, ValidationResult validationResult) {
-		for (FieldValidator<T> fieldValidator : fieldValidators) {
+	protected ValidationResult validateFields(Map<String, Object> model, ValidationResult validationResult) {
+		for (FieldValidator fieldValidator : fieldValidators) {
 			ValidationResult fieldValidationResult = fieldValidator.validate(model);
-			validationResult.getPropertyValidationMessages().putAll(fieldValidationResult.getPropertyValidationMessages());
+			validationResult.getPropertyValidationMessages().addAll(fieldValidationResult.getPropertyValidationMessages());
 		}
 		return validationResult;
 	}
 
-	protected ValidationResult validateForm(T model, ValidationResult validationResult) {
+	protected ValidationResult validateForm(Map<String, Object> model, ValidationResult validationResult) {
 		return validationResult;
 	}
 }

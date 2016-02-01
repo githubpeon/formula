@@ -2,20 +2,23 @@ package com.github.githubpeon.formula.validation;
 
 import java.util.Map;
 
-public class NumberFieldValidator extends DefaultFieldValidator<Map<String, String>> {
+public class NumberFieldValidator extends DefaultFieldValidator {
 
 	@Override
-	public ValidationResult validate(Map<String, String> model) {
+	public ValidationResult validate(Map<String, Object> model) {
 		ValidationResult validationResult = super.validate(model);
+		Object value = model.get(getFormFieldBinding().getProperty());
 
-		try {
-			String value = model.get(getFormFieldBinding().getProperty());
-			if (value != null && !value.isEmpty()) {
-				Integer.parseInt(value);
+		if (!(value instanceof Integer)) {
+			try {
+				String valueString = (String) value;
+				Integer.parseInt(valueString);
+			} catch (Exception e) {
+				validationResult.addError(getFormFieldBinding().getProperty(), value, getFormFieldBinding().getView(), ValidationError.INVALID_NUMBER);
 			}
-		} catch (Exception e) {
-			validationResult.addError(getFormFieldBinding().getProperty(), ValidationError.INVALID_NUMBER);
 		}
+
 		return validationResult;
 	}
+
 }

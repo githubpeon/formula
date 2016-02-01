@@ -30,7 +30,7 @@ public abstract class FormFieldBinding<T extends Object> extends FormBinding<T> 
 		return property;
 	}
 
-	protected Object getPropertyValue() {
+	public Object getPropertyValue() {
 		return this.propertyMap.get(this.property);
 	}
 

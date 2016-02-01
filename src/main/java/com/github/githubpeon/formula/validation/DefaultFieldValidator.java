@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.github.githubpeon.formula.binding.FormFieldBinding;
 
-public class DefaultFieldValidator<T extends Map> implements FieldValidator<T> {
+public class DefaultFieldValidator implements FieldValidator {
 
 	private FormFieldBinding formFieldBinding;
 
@@ -18,11 +18,11 @@ public class DefaultFieldValidator<T extends Map> implements FieldValidator<T> {
 	}
 
 	@Override
-	public ValidationResult validate(T model) {
+	public ValidationResult validate(Map<String, Object> model) {
 		ValidationResult validationResult = new ValidationResult();
 		if (getFormFieldBinding().isRequired()
 				&& getFormFieldBinding().isEmpty()) {
-			validationResult.addError(formFieldBinding.getProperty(), ValidationError.REQUIRED_FIELD_MISSING);
+			validationResult.addError(formFieldBinding.getProperty(), formFieldBinding.getPropertyValue(), formFieldBinding.getView(), ValidationError.REQUIRED_FIELD_MISSING);
 		}
 		return validationResult;
 	}

@@ -108,6 +108,7 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 		}
 
 		Set<FormBinding> formBindings = bindFormFields();
+		validator.setView(this.form);
 		validator.setFormBindings(formBindings);
 
 		return formBindings;
@@ -195,10 +196,9 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 			for (ValidationMessage message : validationResult.getFormValidationMessages()) {
 				System.out.println(message);
 			}
-			for (String key : validationResult.getPropertyValidationMessages().keySet()) {
-				System.out.println(key + ": " + validationResult.getPropertyValidationMessage(key));
+			for (ValidationMessage message : validationResult.getPropertyValidationMessages()) {
+				System.out.println(message.getProperty() + " == " + message);
 			}
-
 		}
 	}
 
@@ -316,7 +316,7 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 			int index = Integer.parseInt(key.substring(lastIndex + 1));
 			Object value = this.propertyMap.get(key);
 			Converter converter = this.converters.get(key);
-			this.objectWrappers.get(index).setValue(key.substring(0, lastIndex), converter.convertTo(value));
+			this.objectWrappers.get(index).setValue(key.substring(0, lastIndex), (Object) converter.convertTo(value));
 		}
 	}
 
