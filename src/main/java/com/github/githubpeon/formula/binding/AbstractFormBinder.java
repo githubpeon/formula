@@ -316,7 +316,7 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 			int index = Integer.parseInt(key.substring(lastIndex + 1));
 			Object value = this.propertyMap.get(key);
 			Converter converter = this.converters.get(key);
-			this.objectWrappers.get(index).setValue(key.substring(0, lastIndex), (Object) converter.convertTo(value));
+			this.objectWrappers.get(index).setValue(key.substring(0, lastIndex), converter.convertTo(value));
 		}
 	}
 

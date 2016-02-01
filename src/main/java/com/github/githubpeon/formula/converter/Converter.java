@@ -1,10 +1,6 @@
 package com.github.githubpeon.formula.converter;
 
-/**
- * @param <T> The class of the property in the model.
- * @param <U> The class of the property in the view.
- */
-public interface Converter<T, U> {
+public interface Converter {
 
 	/**
 	 * Converts FROM the model TO the view.
@@ -12,7 +8,7 @@ public interface Converter<T, U> {
 	 * @param value
 	 * @return
 	 */
-	public U convertFrom(T value);
+	public Object convertFrom(Object value);
 
 	/**
 	 * Converts TO the model FROM the view.
@@ -20,6 +16,6 @@ public interface Converter<T, U> {
 	 * @param value
 	 * @return
 	 */
-	public T convertTo(U value);
+	public Object convertTo(Object value);
 
 }
