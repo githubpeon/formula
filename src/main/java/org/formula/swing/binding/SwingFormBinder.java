@@ -5,7 +5,10 @@ import java.awt.Container;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.JButton;
@@ -75,7 +78,7 @@ public class SwingFormBinder extends AbstractFormBinder implements FocusListener
 
 	private Set<FormBinding> bindContainer(Container container) {
 		Set<FormBinding> formBindings = new HashSet<FormBinding>();
-		for (Field field : container.getClass().getDeclaredFields()) {
+		for (Field field : getAllFields(container)) {
 			try {
 				if (field.isAnnotationPresent(FormField.class)) {
 					FormFieldBinding formFieldBinding = bindFormField(field, container);
@@ -107,6 +110,14 @@ public class SwingFormBinder extends AbstractFormBinder implements FocusListener
 			}
 		}
 		return formBindings;
+	}
+
+	private List<Field> getAllFields(Container container) {
+		List<Field> fields = new ArrayList<Field>();
+		for (Class<?> clazz = container.getClass(); clazz != null; clazz = clazz.getSuperclass()) {
+			fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
+		}
+		return fields;
 	}
 
 	@Override

@@ -43,4 +43,11 @@ public class FormPropertyEditedEvent extends FormEvent {
 		this.newValue = newValue;
 	}
 
+	public boolean isProperty(String property) {
+		if (property != null) {
+			int lastIndex = this.property.lastIndexOf(".");
+			return property.equals(this.property) || property.equals(this.property.substring(0, lastIndex));
+		}
+		return false;
+	}
 }

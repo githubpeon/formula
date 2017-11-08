@@ -17,7 +17,11 @@ public class JTextComponentBinding extends FormFieldBinding<JTextComponent> impl
 
 	@Override
 	protected void doRead() {
-		getView().setText(String.valueOf(getPropertyValue()));
+		if (getPropertyValue() != null) {
+			getView().setText(String.valueOf(getPropertyValue()));
+		} else {
+			getView().setText("");
+		}
 	}
 
 	@Override

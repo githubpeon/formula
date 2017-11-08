@@ -45,7 +45,7 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 	private Validator validator;
 	private final Map<String, Converter> converters = new HashMap<String, Converter>();
 	private final List<ObjectWrapper> objectWrappers = new ArrayList<ObjectWrapper>();
-	private final List<Object> containers = new ArrayList<Object>();
+	private final Map<Class, List<Object>> containers = new HashMap<Class, List<Object>>();
 
 	public AbstractFormBinder(Object form) {
 		if (!form.getClass().isAnnotationPresent(Form.class)) {
@@ -71,7 +71,7 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 			while (iterator.hasNext()) {
 				this.objectWrappers.add(new ObjectWrapper(iterator.next()));
 			}
-		} else {
+		} else if (!(model instanceof Map)) {
 			this.objectWrappers.add(new ObjectWrapper(model));
 		}
 		this.model = model;
@@ -125,10 +125,15 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 			// We add the index of the container to the property key so we can have multiple copies of the same
 			// container in one and the same form. We're going to assume the model is an Iterable when
 			// we have multiple copies.
-			if (!containers.contains(container)) {
-				containers.add(container);
+			List<Object> classContainers = containers.get(container.getClass());
+			if (classContainers == null) {
+				classContainers = new ArrayList<Object>();
+				containers.put(container.getClass(), classContainers);
 			}
-			property += "." + containers.indexOf(container);
+			if (!classContainers.contains(container)) {
+				classContainers.add(container);
+			}
+			property += "." + classContainers.indexOf(container);
 
 			boolean required = formFieldAnnotation.required();
 			Converter converter = null;
@@ -291,23 +296,34 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 		}
 	}
 
-	protected PropertyMap getPropertyMap() {
+	public PropertyMap getPropertyMap() {
 		return propertyMap;
 	}
 
 	private void read() {
 		for (String key : this.propertyMap.keySet()) {
-			// We're assuming we have a key in the form of property.index, for example password.0,
-			// where the index corresponds to the index of the objectwrapper for the specific model
-			// object we're reading from.
+			// We're assuming we have a key in the form of property.index, for example password.0, where
+			// the index corresponds to the index of the objectwrapper for the specific model object
+			// we're reading from. If it's not a map. In that case we just read it straight from the key.
+			Object value = null;
 			int lastIndex = key.lastIndexOf(".");
 			int index = Integer.parseInt(key.substring(lastIndex + 1));
-			Object value = this.objectWrappers.get(index).getValue(key.substring(0, lastIndex));
+
+			if (getModel() instanceof Map) {
+				Map modelMap = (Map) model;
+				value = modelMap.get(key);
+				if (value == null && index == 0) {
+					value = modelMap.get(key.substring(0, lastIndex));
+				}
+			} else {
+				value = this.objectWrappers.get(index).getValue(key.substring(0, lastIndex));
+			}
 			Converter converter = this.converters.get(key);
 			this.propertyMap.put(key, converter.convertFrom(value));
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private void write() {
 		for (String key : this.propertyMap.keySet()) {
 			// And we do the same thing when writing.
@@ -315,7 +331,13 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 			int index = Integer.parseInt(key.substring(lastIndex + 1));
 			Object value = this.propertyMap.get(key);
 			Converter converter = this.converters.get(key);
-			this.objectWrappers.get(index).setValue(key.substring(0, lastIndex), converter.convertTo(value));
+			if (getModel() instanceof Map) {
+				Map modelMap = (Map) model;
+				modelMap.put(key, value);
+				modelMap.put(key.substring(0, lastIndex), value);
+			} else {
+				this.objectWrappers.get(index).setValue(key.substring(0, lastIndex), converter.convertTo(value));
+			}
 		}
 	}
 

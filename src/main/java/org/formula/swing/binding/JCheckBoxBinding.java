@@ -18,7 +18,9 @@ public class JCheckBoxBinding extends FormFieldBinding<JCheckBox> implements Act
 
 	@Override
 	protected void doRead() {
-		getView().setSelected((Boolean) getPropertyValue());
+		if (getPropertyValue() != null) {
+			getView().setSelected((Boolean) getPropertyValue());
+		}
 	}
 
 	@Override
