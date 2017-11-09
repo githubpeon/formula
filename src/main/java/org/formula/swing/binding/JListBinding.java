@@ -10,14 +10,19 @@ import org.formula.binding.PropertyMap;
 
 public class JListBinding extends FormFieldBinding<JList> implements ListSelectionListener {
 
-	public JListBinding(JList jList, FormBinder formBinder, PropertyMap propertyMap, String property, boolean required) {
-		super(jList, formBinder, propertyMap, property, required);
+	public JListBinding(JList jList, FormBinder formBinder, PropertyMap propertyMap, String property, String optionsProperty, boolean required) {
+		super(jList, formBinder, propertyMap, property, optionsProperty, required);
 		jList.addListSelectionListener(this);
 	}
 
 	@Override
 	protected void doRead() {
 		getView().setSelectedValue(getPropertyValue(), true);
+	}
+
+	@Override
+	protected void doReadOptions() {
+
 	}
 
 	@Override

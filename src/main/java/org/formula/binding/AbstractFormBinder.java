@@ -56,6 +56,11 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 		bindForm();
 	}
 
+	public void setProperty(String property, Object value) {
+		Converter converter = this.converters.get(property);
+		this.propertyMap.put(property, converter.convertFrom(value));
+	}
+
 	protected Object getForm() {
 		return this.form;
 	}
@@ -145,7 +150,12 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 				throw new BindingException(e.getClass().getName() + " when creating converter " + converterClass.getName() + ".", e);
 			}
 
-			FormFieldBinding formFieldBinding = bindFormField(formField, property, required);
+			String optionsProperty = formFieldAnnotation.optionsProperty();
+			if (!optionsProperty.isEmpty()) {
+				optionsProperty = optionsProperty + "." + classContainers.indexOf(container);
+			}
+
+			FormFieldBinding formFieldBinding = bindFormField(formField, property, optionsProperty, required);
 
 			Class validatorClass = formFieldAnnotation.validator();
 			try {
@@ -162,7 +172,7 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 		}
 	}
 
-	protected abstract FormFieldBinding bindFormField(Object formField, String property, boolean required);
+	protected abstract FormFieldBinding bindFormField(Object formField, String property, String optionsProperty, boolean required);
 
 	@Override
 	public void propertyChange(PropertyChangeEvent e) {
@@ -296,7 +306,7 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 		}
 	}
 
-	public PropertyMap getPropertyMap() {
+	protected PropertyMap getPropertyMap() {
 		return propertyMap;
 	}
 
@@ -319,7 +329,11 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 				value = this.objectWrappers.get(index).getValue(key.substring(0, lastIndex));
 			}
 			Converter converter = this.converters.get(key);
-			this.propertyMap.put(key, converter.convertFrom(value));
+			if (converter != null) {
+				this.propertyMap.put(key, converter.convertFrom(value));
+			} else {
+				this.propertyMap.put(key, value);
+			}
 		}
 	}
 
@@ -336,7 +350,11 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 				modelMap.put(key, value);
 				modelMap.put(key.substring(0, lastIndex), value);
 			} else {
-				this.objectWrappers.get(index).setValue(key.substring(0, lastIndex), converter.convertTo(value));
+				if (converter != null) {
+					this.objectWrappers.get(index).setValue(key.substring(0, lastIndex), converter.convertTo(value));
+				} else {
+					this.objectWrappers.get(index).setValue(key.substring(0, lastIndex), value);
+				}
 			}
 		}
 	}

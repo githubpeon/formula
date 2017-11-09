@@ -8,13 +8,18 @@ import org.formula.binding.PropertyMap;
 
 public class JProgressBarBinding extends FormFieldBinding<JProgressBar> {
 
-	public JProgressBarBinding(JProgressBar jProgressBar, FormBinder formBinder, PropertyMap propertyMap, String property, boolean required) {
-		super(jProgressBar, formBinder, propertyMap, property, required);
+	public JProgressBarBinding(JProgressBar jProgressBar, FormBinder formBinder, PropertyMap propertyMap, String property, String optionsProperty, boolean required) {
+		super(jProgressBar, formBinder, propertyMap, property, optionsProperty, required);
 	}
 
 	@Override
 	protected void doRead() {
 		getView().setValue((Integer) getPropertyValue());
+	}
+
+	@Override
+	protected void doReadOptions() {
+
 	}
 
 }

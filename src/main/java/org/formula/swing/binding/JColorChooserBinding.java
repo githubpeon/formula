@@ -12,8 +12,8 @@ import org.formula.binding.PropertyMap;
 
 public class JColorChooserBinding extends FormFieldBinding<JColorChooser> implements ChangeListener {
 
-	public JColorChooserBinding(JColorChooser jColorChooser, FormBinder formBinder, PropertyMap propertyMap, String property, boolean required) {
-		super(jColorChooser, formBinder, propertyMap, property, required);
+	public JColorChooserBinding(JColorChooser jColorChooser, FormBinder formBinder, PropertyMap propertyMap, String property, String optionsProperty, boolean required) {
+		super(jColorChooser, formBinder, propertyMap, property, optionsProperty, required);
 		jColorChooser.getSelectionModel().addChangeListener(this);
 	}
 
@@ -22,6 +22,11 @@ public class JColorChooserBinding extends FormFieldBinding<JColorChooser> implem
 		if (getPropertyValue() != null) {
 			getView().setColor((Color) getPropertyValue());
 		}
+	}
+
+	@Override
+	protected void doReadOptions() {
+
 	}
 
 	@Override

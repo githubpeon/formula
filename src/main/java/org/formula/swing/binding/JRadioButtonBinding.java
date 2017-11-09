@@ -11,8 +11,8 @@ import org.formula.binding.PropertyMap;
 
 public class JRadioButtonBinding extends FormFieldBinding<JRadioButton> implements ActionListener {
 
-	public JRadioButtonBinding(JRadioButton jRadioButton, FormBinder formBinder, PropertyMap propertyMap, String property, boolean required) {
-		super(jRadioButton, formBinder, propertyMap, property, required);
+	public JRadioButtonBinding(JRadioButton jRadioButton, FormBinder formBinder, PropertyMap propertyMap, String property, String optionsProperty, boolean required) {
+		super(jRadioButton, formBinder, propertyMap, property, optionsProperty, required);
 		jRadioButton.addActionListener(this);
 	}
 
@@ -22,6 +22,11 @@ public class JRadioButtonBinding extends FormFieldBinding<JRadioButton> implemen
 		if (value != null && value.equals(getView().getActionCommand())) {
 			getView().setSelected(true);
 		}
+	}
+
+	@Override
+	protected void doReadOptions() {
+
 	}
 
 	@Override

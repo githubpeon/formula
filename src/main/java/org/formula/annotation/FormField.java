@@ -14,6 +14,8 @@ public @interface FormField {
 
 	String property();
 
+	String optionsProperty() default "";
+
 	boolean required() default false;
 
 	Class validator() default DefaultFieldValidator.class;

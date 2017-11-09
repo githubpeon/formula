@@ -10,8 +10,8 @@ import org.formula.binding.PropertyMap;
 
 public class JSliderBinding extends FormFieldBinding<JSlider> implements ChangeListener {
 
-	public JSliderBinding(JSlider jSlider, FormBinder formBinder, PropertyMap propertyMap, String property, boolean required) {
-		super(jSlider, formBinder, propertyMap, property, required);
+	public JSliderBinding(JSlider jSlider, FormBinder formBinder, PropertyMap propertyMap, String property, String optionsProperty, boolean required) {
+		super(jSlider, formBinder, propertyMap, property, optionsProperty, required);
 		jSlider.addChangeListener(this);
 	}
 
@@ -20,6 +20,11 @@ public class JSliderBinding extends FormFieldBinding<JSlider> implements ChangeL
 		if (getPropertyValue() != null) {
 			getView().setValue((Integer) getPropertyValue());
 		}
+	}
+
+	@Override
+	protected void doReadOptions() {
+
 	}
 
 	@Override

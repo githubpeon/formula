@@ -8,6 +8,8 @@ public interface FormBinder {
 
 	public void setModel(Object model);
 
+	public void setProperty(String property, Object value);
+
 	public void refresh();
 
 	public void commit();

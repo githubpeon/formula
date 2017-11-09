@@ -10,8 +10,8 @@ import org.formula.binding.PropertyMap;
 
 public class JTextComponentBinding extends FormFieldBinding<JTextComponent> implements DocumentListener {
 
-	public JTextComponentBinding(JTextComponent jTextComponent, FormBinder formBinder, PropertyMap propertyMap, String property, boolean required) {
-		super(jTextComponent, formBinder, propertyMap, property, required);
+	public JTextComponentBinding(JTextComponent jTextComponent, FormBinder formBinder, PropertyMap propertyMap, String property, String optionsProperty, boolean required) {
+		super(jTextComponent, formBinder, propertyMap, property, optionsProperty, required);
 		jTextComponent.getDocument().addDocumentListener(this);
 	}
 
@@ -22,6 +22,11 @@ public class JTextComponentBinding extends FormFieldBinding<JTextComponent> impl
 		} else {
 			getView().setText("");
 		}
+	}
+
+	@Override
+	protected void doReadOptions() {
+
 	}
 
 	@Override

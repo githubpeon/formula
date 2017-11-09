@@ -11,8 +11,8 @@ import org.formula.binding.PropertyMap;
 
 public class JCheckBoxBinding extends FormFieldBinding<JCheckBox> implements ActionListener {
 
-	public JCheckBoxBinding(JCheckBox jCheckBox, FormBinder formBinder, PropertyMap propertyMap, String property, boolean required) {
-		super(jCheckBox, formBinder, propertyMap, property, required);
+	public JCheckBoxBinding(JCheckBox jCheckBox, FormBinder formBinder, PropertyMap propertyMap, String property, String optionsProperty, boolean required) {
+		super(jCheckBox, formBinder, propertyMap, property, optionsProperty, required);
 		jCheckBox.addActionListener(this);
 	}
 
@@ -21,6 +21,11 @@ public class JCheckBoxBinding extends FormFieldBinding<JCheckBox> implements Act
 		if (getPropertyValue() != null) {
 			getView().setSelected((Boolean) getPropertyValue());
 		}
+	}
+
+	@Override
+	protected void doReadOptions() {
+
 	}
 
 	@Override

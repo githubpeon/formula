@@ -10,8 +10,8 @@ import org.formula.binding.PropertyMap;
 
 public class JSpinnerBinding extends FormFieldBinding<JSpinner> implements ChangeListener {
 
-	public JSpinnerBinding(JSpinner jSpinner, FormBinder formBinder, PropertyMap propertyMap, String property, boolean required) {
-		super(jSpinner, formBinder, propertyMap, property, required);
+	public JSpinnerBinding(JSpinner jSpinner, FormBinder formBinder, PropertyMap propertyMap, String property, String optionsProperty, boolean required) {
+		super(jSpinner, formBinder, propertyMap, property, optionsProperty, required);
 		jSpinner.addChangeListener(this);
 	}
 
@@ -20,6 +20,11 @@ public class JSpinnerBinding extends FormFieldBinding<JSpinner> implements Chang
 		if (getPropertyValue() != null) {
 			getView().setValue(getPropertyValue());
 		}
+	}
+
+	@Override
+	protected void doReadOptions() {
+
 	}
 
 	@Override
