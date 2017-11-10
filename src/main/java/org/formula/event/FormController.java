@@ -1,8 +1,11 @@
 package org.formula.event;
 
-import org.formula.binding.FormBinder;
+import java.util.Map;
 
-public class FormController<T extends Object, U extends Object> extends DefaultFormListener {
+import org.formula.binding.FormBinder;
+import org.formula.validation.ConfirmationHandler;
+
+public class FormController<T extends Object, U extends Object> extends DefaultFormListener implements ConfirmationHandler {
 
 	private FormBinder formBinder;
 	private T form;
@@ -45,4 +48,10 @@ public class FormController<T extends Object, U extends Object> extends DefaultF
 		property = property + "." + index;
 		this.formBinder.setProperty(property, value);
 	}
+
+	@Override
+	public boolean confirmCommit(Map<String, Object> propertyMap) {
+		return true;
+	}
+
 }

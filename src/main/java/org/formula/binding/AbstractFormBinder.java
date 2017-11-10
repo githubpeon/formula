@@ -28,6 +28,7 @@ import org.formula.event.FormPropertyEditedEvent;
 import org.formula.event.FormRefreshedEvent;
 import org.formula.event.FormRolledBackEvent;
 import org.formula.event.FormValidationListener;
+import org.formula.validation.ConfirmationHandler;
 import org.formula.validation.FieldValidator;
 import org.formula.validation.ValidationMessage;
 import org.formula.validation.ValidationResult;
@@ -43,6 +44,7 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 	private final Object form;
 	private Object model;
 	private Validator validator;
+	private ConfirmationHandler confirmationHandler;
 	private final Map<String, Converter> converters = new HashMap<String, Converter>();
 	private final List<ObjectWrapper> objectWrappers = new ArrayList<ObjectWrapper>();
 	private final Map<Class, List<Object>> containers = new HashMap<Class, List<Object>>();
@@ -95,6 +97,14 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 
 	public void setValidator(Validator validator) {
 		this.validator = validator;
+	}
+
+	public ConfirmationHandler getConfirmationHandler() {
+		return confirmationHandler;
+	}
+
+	public void setConfirmationHandler(ConfirmationHandler confirmationHandler) {
+		this.confirmationHandler = confirmationHandler;
 	}
 
 	protected void addConverter(String property, Converter converter) {
@@ -201,7 +211,7 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 	public void commit() {
 		ValidationResult validationResult = validate();
 		fireFormValidationEvent(new FormCommitValidationEvent(this, validationResult));
-		if (!validationResult.hasErrors()) {
+		if (!validationResult.hasErrors() && (this.confirmationHandler == null || this.confirmationHandler.confirmCommit(this.propertyMap))) {
 			write();
 			System.out.println("Commit: " + propertyMap + " to " + getModel());
 			fireFormEvent(new FormCommittedEvent(this));

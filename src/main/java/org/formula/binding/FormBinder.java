@@ -3,6 +3,7 @@ package org.formula.binding;
 import org.formula.event.FormFieldListener;
 import org.formula.event.FormListener;
 import org.formula.event.FormValidationListener;
+import org.formula.validation.ConfirmationHandler;
 
 public interface FormBinder {
 
@@ -27,5 +28,7 @@ public interface FormBinder {
 	public void addFormValidationListener(FormValidationListener listener);
 
 	public void removeFormValidationListener(FormValidationListener listener);
+
+	public void setConfirmationHandler(ConfirmationHandler confirmationHandler);
 
 }
