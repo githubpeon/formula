@@ -1,21 +1,21 @@
 package org.formula.converter;
 
-public interface Converter {
+public interface Converter<T extends Object, U extends Object> {
 
 	/**
 	 * Converts FROM the model TO the view.
-	 * 
+	 *
 	 * @param value
 	 * @return
 	 */
-	public Object convertFrom(Object value);
+	public U convertFrom(T value);
 
 	/**
 	 * Converts TO the model FROM the view.
-	 * 
+	 *
 	 * @param value
 	 * @return
 	 */
-	public Object convertTo(Object value);
+	public T convertTo(U value);
 
 }

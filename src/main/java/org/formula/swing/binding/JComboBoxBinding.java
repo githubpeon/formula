@@ -2,6 +2,7 @@ package org.formula.swing.binding;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 import java.util.Collection;
 
 import javax.swing.JComboBox;
@@ -25,11 +26,16 @@ public class JComboBoxBinding extends FormFieldBinding<JComboBox> implements Act
 	@Override
 	@SuppressWarnings("unchecked")
 	protected void doReadOptions() {
+	    getView().removeAllItems();
 		Object optionsPropertyValue = getOptionsPropertyValue();
-		if (optionsPropertyValue != null && optionsPropertyValue instanceof Collection) {
-			for (Object object : (Collection) optionsPropertyValue) {
-				getView().addItem(object);
-			}
+		if(optionsPropertyValue != null) {
+    		if(optionsPropertyValue.getClass().isArray()) {
+    		    optionsPropertyValue = Arrays.asList((Object[])optionsPropertyValue);
+    		} else if (optionsPropertyValue instanceof Iterable) {
+    			for (Object object : (Collection) optionsPropertyValue) {
+    				getView().addItem(object);
+    			}
+    		}
 		}
 	}
 

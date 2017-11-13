@@ -1,5 +1,7 @@
 package org.formula.swing.binding;
 
+import java.util.ArrayList;
+
 import javax.swing.JList;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -22,7 +24,18 @@ public class JListBinding extends FormFieldBinding<JList> implements ListSelecti
 
 	@Override
 	protected void doReadOptions() {
-
+        Object optionsPropertyValue = getOptionsPropertyValue();
+        if(optionsPropertyValue != null) {
+            if(optionsPropertyValue.getClass().isArray()) {
+                getView().setListData((Object[])optionsPropertyValue);
+            } else if(optionsPropertyValue instanceof Iterable) {
+                ArrayList<Object> arrayList = new ArrayList<Object>();
+                for(Object object : (Iterable)optionsPropertyValue) {
+                    arrayList.add(object);
+                }
+                getView().setListData(arrayList.toArray());
+            }
+        }
 	}
 
 	@Override
