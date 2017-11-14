@@ -11,6 +11,8 @@ import org.formula.binding.FormBinding;
 import org.formula.event.FormCommitValidationEvent;
 import org.formula.event.FormCommittedEvent;
 import org.formula.event.FormEditValidationEvent;
+import org.formula.event.FormEnableEvent;
+import org.formula.event.FormEnableListener;
 import org.formula.event.FormFieldFocusGainedEvent;
 import org.formula.event.FormFieldFocusLostEvent;
 import org.formula.event.FormFieldListener;
@@ -22,7 +24,7 @@ import org.formula.event.FormRolledBackEvent;
 import org.formula.event.FormValidationListener;
 import org.formula.validation.ValidationResult;
 
-public class JButtonCommitBinding extends FormBinding<JButton> implements ActionListener, FormListener, FormFieldListener, FormValidationListener {
+public class JButtonCommitBinding extends FormBinding<JButton> implements ActionListener, FormListener, FormFieldListener, FormValidationListener, FormEnableListener {
 
 	public JButtonCommitBinding(JButton jButton, FormBinder formBinder) {
 		super(jButton, formBinder);
@@ -31,6 +33,7 @@ public class JButtonCommitBinding extends FormBinding<JButton> implements Action
 		formBinder.addFormListener(this);
 		formBinder.addFormFieldListener(this);
 		formBinder.addFormValidationListener(this);
+		formBinder.addFormEnableListener(this);
 	}
 
 	@Override
@@ -88,6 +91,14 @@ public class JButtonCommitBinding extends FormBinding<JButton> implements Action
 	@Override
 	public void formCommitValidation(FormCommitValidationEvent e) {
 		// We don't care about this
+	}
+
+	@Override
+	public void formEnable(FormEnableEvent e) {
+		getView().setEnabled(e.isEnable());
+		if (e.isRequestFocus()) {
+			getView().requestFocus();
+		}
 	}
 
 }

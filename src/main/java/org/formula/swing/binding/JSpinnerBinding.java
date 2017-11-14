@@ -1,6 +1,10 @@
 package org.formula.swing.binding;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import javax.swing.JSpinner;
+import javax.swing.SpinnerListModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -18,13 +22,31 @@ public class JSpinnerBinding extends FormFieldBinding<JSpinner> implements Chang
 	@Override
 	protected void doRead() {
 		if (getPropertyValue() != null) {
-			getView().setValue(getPropertyValue());
+			try {
+				getView().setValue(getPropertyValue());
+			} catch (IllegalArgumentException e) {
+				// We've probably not initialized the spinner model yet.
+			}
 		}
 	}
 
 	@Override
 	protected void doReadOptions() {
-
+		Object optionsPropertyValue = getOptionsPropertyValue();
+		if (optionsPropertyValue != null && getView().getModel() instanceof SpinnerListModel) {
+			SpinnerListModel spinnerListModel = (SpinnerListModel) getView().getModel();
+			if (optionsPropertyValue.getClass().isArray()) {
+				optionsPropertyValue = Arrays.asList((Object[]) optionsPropertyValue);
+			}
+			if (optionsPropertyValue instanceof Iterable) {
+				ArrayList<Object> objects = new ArrayList<Object>();
+				for (Object object : (Iterable) optionsPropertyValue) {
+					objects.add(object);
+				}
+				spinnerListModel.setList(objects);
+			}
+		}
+		doRead();
 	}
 
 	@Override

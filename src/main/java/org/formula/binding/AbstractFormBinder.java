@@ -18,6 +18,8 @@ import org.formula.converter.Converter;
 import org.formula.event.FormCommitValidationEvent;
 import org.formula.event.FormCommittedEvent;
 import org.formula.event.FormEditValidationEvent;
+import org.formula.event.FormEnableEvent;
+import org.formula.event.FormEnableListener;
 import org.formula.event.FormEvent;
 import org.formula.event.FormFieldFocusGainedEvent;
 import org.formula.event.FormFieldFocusLostEvent;
@@ -40,6 +42,7 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 	private final Set<FormListener> formListeners = new HashSet<FormListener>();
 	private final Set<FormFieldListener> formFieldListeners = new HashSet<FormFieldListener>();
 	private final Set<FormValidationListener> formValidationListeners = new HashSet<FormValidationListener>();
+	private final Set<FormEnableListener> formEnableListeners = new HashSet<FormEnableListener>();
 	private final PropertyMap propertyMap = new PropertyMap();
 	private final Object form;
 	private Object model;
@@ -234,6 +237,11 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 	}
 
 	@Override
+	public void enable(boolean enable, boolean requestFocus) {
+		fireFormEnableEvent(new FormEnableEvent(this, enable, requestFocus));
+	}
+
+	@Override
 	public synchronized void addFormListener(FormListener listener) {
 		if (listener != null) {
 			this.formListeners.add(listener);
@@ -275,6 +283,20 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 		}
 	}
 
+	@Override
+	public synchronized void addFormEnableListener(FormEnableListener listener) {
+		if (listener != null) {
+			this.formEnableListeners.add(listener);
+		}
+	}
+
+	@Override
+	public synchronized void removeFormEnableListener(FormEnableListener listener) {
+		if (listener != null) {
+			this.formEnableListeners.remove(listener);
+		}
+	}
+
 	protected void fireFormEvent(FormEvent e) {
 		Object[] listeners = formListeners.toArray();
 		for (Object listener : listeners) {
@@ -313,6 +335,16 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 				formValidationListener.formEditValidation((FormEditValidationEvent) e);
 			} else if (e instanceof FormCommitValidationEvent) {
 				formValidationListener.formCommitValidation((FormCommitValidationEvent) e);
+			}
+		}
+	}
+
+	protected void fireFormEnableEvent(FormEvent e) {
+		Object[] listeners = formEnableListeners.toArray();
+		for (Object listener : listeners) {
+			FormEnableListener formEnableListener = (FormEnableListener) listener;
+			if (e instanceof FormEnableEvent) {
+				formEnableListener.formEnable((FormEnableEvent) e);
 			}
 		}
 	}

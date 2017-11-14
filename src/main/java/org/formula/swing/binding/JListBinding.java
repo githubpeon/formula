@@ -37,6 +37,7 @@ public class JListBinding extends FormFieldBinding<JList> implements ListSelecti
 				getView().setListData(arrayList.toArray());
 			}
 		}
+		doRead();
 	}
 
 	@Override
