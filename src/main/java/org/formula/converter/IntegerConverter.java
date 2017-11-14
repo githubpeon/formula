@@ -1,6 +1,6 @@
 package org.formula.converter;
 
-public class IntegerConverter implements Converter {
+public class IntegerConverter implements Converter<Integer, String> {
 
 	/**
 	 * Converts FROM the model TO the view.
@@ -9,7 +9,7 @@ public class IntegerConverter implements Converter {
 	 * @return
 	 */
 	@Override
-	public Object convertFrom(Object value) {
+	public String convertFrom(Integer value) {
 		return String.valueOf(value);
 	}
 
@@ -20,8 +20,8 @@ public class IntegerConverter implements Converter {
 	 * @return
 	 */
 	@Override
-	public Object convertTo(Object value) {
-		String valueString = (String) value;
+	public Integer convertTo(String value) {
+		String valueString = value;
 		return (valueString == null || valueString.isEmpty() ? 0 : Integer.decode(valueString));
 	}
 

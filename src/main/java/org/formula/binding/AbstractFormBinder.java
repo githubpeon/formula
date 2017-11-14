@@ -58,6 +58,7 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 		bindForm();
 	}
 
+	@SuppressWarnings("unchecked")
 	public void setProperty(String property, Object value) {
 		Converter converter = this.converters.get(property);
 		this.propertyMap.put(property, converter.convertFrom(value));
@@ -320,6 +321,7 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 		return propertyMap;
 	}
 
+	@SuppressWarnings("unchecked")
 	private void read() {
 		for (String key : this.propertyMap.keySet()) {
 			// We're assuming we have a key in the form of property.index, for example password.0, where
