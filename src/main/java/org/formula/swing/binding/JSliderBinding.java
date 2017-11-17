@@ -7,11 +7,12 @@ import javax.swing.event.ChangeListener;
 import org.formula.binding.FormBinder;
 import org.formula.binding.FormFieldBinding;
 import org.formula.binding.PropertyMap;
+import org.formula.converter.Converter;
 
 public class JSliderBinding extends FormFieldBinding<JSlider> implements ChangeListener {
 
-	public JSliderBinding(JSlider jSlider, FormBinder formBinder, PropertyMap propertyMap, String property, String optionsProperty, boolean required) {
-		super(jSlider, formBinder, propertyMap, property, optionsProperty, required);
+	public JSliderBinding(JSlider jSlider, FormBinder formBinder, PropertyMap propertyMap, String property, String optionsProperty, boolean required, Converter converter) {
+		super(jSlider, formBinder, propertyMap, property, optionsProperty, required, converter);
 		jSlider.addChangeListener(this);
 	}
 

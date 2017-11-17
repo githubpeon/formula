@@ -1,17 +1,6 @@
 package org.formula.converter;
 
-public class IntegerConverter implements Converter<Integer, String> {
-
-	/**
-	 * Converts FROM the model TO the view.
-	 * 
-	 * @param value
-	 * @return
-	 */
-	@Override
-	public String convertFrom(Integer value) {
-		return String.valueOf(value);
-	}
+public class IntegerConverter extends DefaultConverter {
 
 	/**
 	 * Converts TO the model FROM the view.
@@ -20,9 +9,13 @@ public class IntegerConverter implements Converter<Integer, String> {
 	 * @return
 	 */
 	@Override
-	public Integer convertTo(String value) {
-		String valueString = value;
-		return (valueString == null || valueString.isEmpty() ? 0 : Integer.decode(valueString));
+	public Object convertTo(Object value) {
+		try {
+			String valueString = (String) value;
+			return (valueString == null || valueString.isEmpty() ? 0 : Integer.decode(valueString));
+		} catch (NumberFormatException e) {
+			return 0;
+		}
 	}
 
 }

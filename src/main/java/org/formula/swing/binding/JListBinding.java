@@ -9,11 +9,12 @@ import javax.swing.event.ListSelectionListener;
 import org.formula.binding.FormBinder;
 import org.formula.binding.FormFieldBinding;
 import org.formula.binding.PropertyMap;
+import org.formula.converter.Converter;
 
 public class JListBinding extends FormFieldBinding<JList> implements ListSelectionListener {
 
-	public JListBinding(JList jList, FormBinder formBinder, PropertyMap propertyMap, String property, String optionsProperty, boolean required) {
-		super(jList, formBinder, propertyMap, property, optionsProperty, required);
+	public JListBinding(JList jList, FormBinder formBinder, PropertyMap propertyMap, String property, String optionsProperty, boolean required, Converter converter) {
+		super(jList, formBinder, propertyMap, property, optionsProperty, required, converter);
 		jList.addListSelectionListener(this);
 	}
 

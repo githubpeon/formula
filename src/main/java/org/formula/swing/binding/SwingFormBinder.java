@@ -32,6 +32,7 @@ import org.formula.binding.AbstractFormBinder;
 import org.formula.binding.BindingException;
 import org.formula.binding.FormBinding;
 import org.formula.binding.FormFieldBinding;
+import org.formula.converter.Converter;
 import org.formula.event.FormFieldFocusGainedEvent;
 import org.formula.event.FormFieldFocusLostEvent;
 
@@ -48,30 +49,30 @@ public class SwingFormBinder extends AbstractFormBinder implements FocusListener
 	}
 
 	@Override
-	protected FormFieldBinding bindFormField(Object formField, String property, String optionsProperty, boolean required) {
+	protected FormFieldBinding bindFormField(Object formField, String property, String optionsProperty, boolean required, Converter converter) {
 		if (formField instanceof JComponent) {
 			((JComponent) formField).addFocusListener(this);
 		}
 		if (formField instanceof JLabel) {
-			return new JLabelBinding((JLabel) formField, this, getPropertyMap(), property, optionsProperty, required);
+			return new JLabelBinding((JLabel) formField, this, getPropertyMap(), property, optionsProperty, required, converter);
 		} else if (formField instanceof JTextComponent) {
-			return new JTextComponentBinding((JTextComponent) formField, this, getPropertyMap(), property, optionsProperty, required);
+			return new JTextComponentBinding((JTextComponent) formField, this, getPropertyMap(), property, optionsProperty, required, converter);
 		} else if (formField instanceof JComboBox) {
-			return new JComboBoxBinding((JComboBox) formField, this, getPropertyMap(), property, optionsProperty, required);
+			return new JComboBoxBinding((JComboBox) formField, this, getPropertyMap(), property, optionsProperty, required, converter);
 		} else if (formField instanceof JCheckBox) {
-			return new JCheckBoxBinding((JCheckBox) formField, this, getPropertyMap(), property, optionsProperty, required);
+			return new JCheckBoxBinding((JCheckBox) formField, this, getPropertyMap(), property, optionsProperty, required, converter);
 		} else if (formField instanceof JRadioButton) {
-			return new JRadioButtonBinding((JRadioButton) formField, this, getPropertyMap(), property, optionsProperty, required);
+			return new JRadioButtonBinding((JRadioButton) formField, this, getPropertyMap(), property, optionsProperty, required, converter);
 		} else if (formField instanceof JList) {
-			return new JListBinding((JList) formField, this, getPropertyMap(), property, optionsProperty, required);
+			return new JListBinding((JList) formField, this, getPropertyMap(), property, optionsProperty, required, converter);
 		} else if (formField instanceof JSlider) {
-			return new JSliderBinding((JSlider) formField, this, getPropertyMap(), property, optionsProperty, required);
+			return new JSliderBinding((JSlider) formField, this, getPropertyMap(), property, optionsProperty, required, converter);
 		} else if (formField instanceof JSpinner) {
-			return new JSpinnerBinding((JSpinner) formField, this, getPropertyMap(), property, optionsProperty, required);
+			return new JSpinnerBinding((JSpinner) formField, this, getPropertyMap(), property, optionsProperty, required, converter);
 		} else if (formField instanceof JProgressBar) {
-			return new JProgressBarBinding((JProgressBar) formField, this, getPropertyMap(), property, optionsProperty, required);
+			return new JProgressBarBinding((JProgressBar) formField, this, getPropertyMap(), property, optionsProperty, required, converter);
 		} else if (formField instanceof JColorChooser) {
-			return new JColorChooserBinding((JColorChooser) formField, this, getPropertyMap(), property, optionsProperty, required);
+			return new JColorChooserBinding((JColorChooser) formField, this, getPropertyMap(), property, optionsProperty, required, converter);
 		}
 		throw new BindingException("Binding for class " + formField.getClass().getName() + " is not implemented in binder " + getClass().getName());
 	}

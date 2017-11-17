@@ -9,11 +9,12 @@ import javax.swing.event.ChangeListener;
 import org.formula.binding.FormBinder;
 import org.formula.binding.FormFieldBinding;
 import org.formula.binding.PropertyMap;
+import org.formula.converter.Converter;
 
 public class JColorChooserBinding extends FormFieldBinding<JColorChooser> implements ChangeListener {
 
-	public JColorChooserBinding(JColorChooser jColorChooser, FormBinder formBinder, PropertyMap propertyMap, String property, String optionsProperty, boolean required) {
-		super(jColorChooser, formBinder, propertyMap, property, optionsProperty, required);
+	public JColorChooserBinding(JColorChooser jColorChooser, FormBinder formBinder, PropertyMap propertyMap, String property, String optionsProperty, boolean required, Converter converter) {
+		super(jColorChooser, formBinder, propertyMap, property, optionsProperty, required, converter);
 		jColorChooser.getSelectionModel().addChangeListener(this);
 	}
 

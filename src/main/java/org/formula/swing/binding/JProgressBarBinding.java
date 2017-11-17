@@ -5,11 +5,12 @@ import javax.swing.JProgressBar;
 import org.formula.binding.FormBinder;
 import org.formula.binding.FormFieldBinding;
 import org.formula.binding.PropertyMap;
+import org.formula.converter.Converter;
 
 public class JProgressBarBinding extends FormFieldBinding<JProgressBar> {
 
-	public JProgressBarBinding(JProgressBar jProgressBar, FormBinder formBinder, PropertyMap propertyMap, String property, String optionsProperty, boolean required) {
-		super(jProgressBar, formBinder, propertyMap, property, optionsProperty, required);
+	public JProgressBarBinding(JProgressBar jProgressBar, FormBinder formBinder, PropertyMap propertyMap, String property, String optionsProperty, boolean required, Converter converter) {
+		super(jProgressBar, formBinder, propertyMap, property, optionsProperty, required, converter);
 	}
 
 	@Override

@@ -3,22 +3,26 @@ package org.formula.binding;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import org.formula.converter.Converter;
+
 public abstract class FormFieldBinding<T extends Object> extends FormBinding<T> implements PropertyChangeListener {
 
 	private String property;
 	private String optionsProperty;
 	private PropertyMap propertyMap;
 	private boolean required;
+	private Converter converter;
 
 	private boolean reading;
 	private boolean writing;
 
-	public FormFieldBinding(T view, FormBinder formBinder, PropertyMap propertyMap, String property, String optionsProperty, boolean required) {
+	public FormFieldBinding(T view, FormBinder formBinder, PropertyMap propertyMap, String property, String optionsProperty, boolean required, Converter converter) {
 		super(view, formBinder);
 		this.propertyMap = propertyMap;
 		this.property = property;
 		this.optionsProperty = optionsProperty;
 		this.required = required;
+		this.converter = converter;
 
 		this.propertyMap.put(property, null);
 		propertyMap.addPropertyChangeListener(property, this);
@@ -40,8 +44,9 @@ public abstract class FormFieldBinding<T extends Object> extends FormBinding<T> 
 		return this.optionsProperty;
 	}
 
+	@SuppressWarnings("unchecked")
 	public Object getPropertyValue() {
-		return this.propertyMap.get(this.property);
+		return this.converter.convertFrom(this.propertyMap.get(this.property));
 	}
 
 	public Object getOptionsPropertyValue() {
@@ -87,10 +92,11 @@ public abstract class FormFieldBinding<T extends Object> extends FormBinding<T> 
 
 	protected abstract void doReadOptions();
 
+	@SuppressWarnings("unchecked")
 	protected void write(Object value) {
 		if (!this.reading) {
 			this.writing = true;
-			this.propertyMap.put(this.property, value);
+			this.propertyMap.put(this.property, this.converter.convertTo(value));
 			this.writing = false;
 		}
 	}

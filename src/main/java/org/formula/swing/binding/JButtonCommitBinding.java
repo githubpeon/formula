@@ -22,9 +22,12 @@ import org.formula.event.FormPropertyEditedEvent;
 import org.formula.event.FormRefreshedEvent;
 import org.formula.event.FormRolledBackEvent;
 import org.formula.event.FormValidationListener;
+import org.formula.validation.ValidationMessage;
 import org.formula.validation.ValidationResult;
 
 public class JButtonCommitBinding extends FormBinding<JButton> implements ActionListener, FormListener, FormFieldListener, FormValidationListener, FormEnableListener {
+
+	private String defaultToolTipText;
 
 	public JButtonCommitBinding(JButton jButton, FormBinder formBinder) {
 		super(jButton, formBinder);
@@ -79,12 +82,23 @@ public class JButtonCommitBinding extends FormBinding<JButton> implements Action
 	@Override
 	public void formEditValidation(FormEditValidationEvent e) {
 		ValidationResult validationResult = e.getValidationResult();
-		if (getView().isEnabled()
-				&& validationResult.isMissingRequiredProperties()) {
+		if (!validationResult.isAllowCommit()) {
 			getView().setEnabled(false);
-		} else if (!getView().isEnabled()
-				&& !validationResult.isMissingRequiredProperties()) {
+			if (this.defaultToolTipText == null) {
+				this.defaultToolTipText = getView().getToolTipText();
+			}
+			StringBuilder stringBuilder = new StringBuilder("<html>");
+			for (ValidationMessage validationMessage : validationResult.getFormValidationMessages()) {
+				stringBuilder.append(validationMessage.getMessage() + "<br>");
+			}
+			stringBuilder.append("</html>");
+			getView().setToolTipText(stringBuilder.toString());
+		} else if (validationResult.isMissingRequiredProperties()) {
+			getView().setEnabled(false);
+		} else {
 			getView().setEnabled(true);
+			getView().setToolTipText(this.defaultToolTipText);
+			this.defaultToolTipText = null;
 		}
 	}
 

@@ -9,11 +9,12 @@ import javax.swing.JComboBox;
 import org.formula.binding.FormBinder;
 import org.formula.binding.FormFieldBinding;
 import org.formula.binding.PropertyMap;
+import org.formula.converter.Converter;
 
 public class JComboBoxBinding extends FormFieldBinding<JComboBox> implements ActionListener {
 
-	public JComboBoxBinding(JComboBox jComboBox, FormBinder formBinder, PropertyMap propertyMap, String property, String optionsProperty, boolean required) {
-		super(jComboBox, formBinder, propertyMap, property, optionsProperty, required);
+	public JComboBoxBinding(JComboBox jComboBox, FormBinder formBinder, PropertyMap propertyMap, String property, String optionsProperty, boolean required, Converter converter) {
+		super(jComboBox, formBinder, propertyMap, property, optionsProperty, required, converter);
 		jComboBox.addActionListener(this);
 	}
 

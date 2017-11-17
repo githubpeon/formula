@@ -9,6 +9,7 @@ public class ValidationResult {
 
 	private final List<ValidationMessage> formValidationMessages = new ArrayList<ValidationMessage>();
 	private final List<ValidationMessage> propertyValidationMessages = new ArrayList<ValidationMessage>();
+	private boolean allowCommit = true;
 
 	public void addInfo(Object view, Object message) {
 		formValidationMessages.add(new ValidationMessage(view, message, Severity.INFO));
@@ -80,6 +81,14 @@ public class ValidationResult {
 			}
 		}
 		return false;
+	}
+
+	public boolean isAllowCommit() {
+		return allowCommit;
+	}
+
+	public void setAllowCommit(boolean allowCommit) {
+		this.allowCommit = allowCommit;
 	}
 
 	@Override

@@ -45,12 +45,13 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 	private final Set<FormEnableListener> formEnableListeners = new HashSet<FormEnableListener>();
 	private final PropertyMap propertyMap = new PropertyMap();
 	private final Object form;
-	private Object model;
-	private Validator validator;
-	private ConfirmationHandler confirmationHandler;
 	private final Map<String, Converter> converters = new HashMap<String, Converter>();
 	private final List<ObjectWrapper> objectWrappers = new ArrayList<ObjectWrapper>();
 	private final Map<Class, List<Object>> containers = new HashMap<Class, List<Object>>();
+	private Object model;
+	private Validator validator;
+	private ConfirmationHandler confirmationHandler;
+	private boolean initialized = false;
 
 	public AbstractFormBinder(Object form) {
 		if (!form.getClass().isAnnotationPresent(Form.class)) {
@@ -61,10 +62,8 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 		bindForm();
 	}
 
-	@SuppressWarnings("unchecked")
 	public void setProperty(String property, Object value) {
-		Converter converter = this.converters.get(property);
-		this.propertyMap.put(property, converter.convertFrom(value));
+		this.propertyMap.put(property, value);
 	}
 
 	protected Object getForm() {
@@ -77,6 +76,7 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 
 	@Override
 	public void setModel(Object model) {
+		this.initialized = false;
 		if (model instanceof Collection) {
 			Iterator iterator = ((Collection) model).iterator();
 			while (iterator.hasNext()) {
@@ -169,7 +169,7 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 				optionsProperty = optionsProperty + "." + classContainers.indexOf(container);
 			}
 
-			FormFieldBinding formFieldBinding = bindFormField(formField, property, optionsProperty, required);
+			FormFieldBinding formFieldBinding = bindFormField(formField, property, optionsProperty, required, converter);
 
 			Class validatorClass = formFieldAnnotation.validator();
 			try {
@@ -186,7 +186,7 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 		}
 	}
 
-	protected abstract FormFieldBinding bindFormField(Object formField, String property, String optionsProperty, boolean required);
+	protected abstract FormFieldBinding bindFormField(Object formField, String property, String optionsProperty, boolean required, Converter converter);
 
 	@Override
 	public void propertyChange(PropertyChangeEvent e) {
@@ -199,11 +199,12 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 
 	protected void init() {
 		read();
+		this.initialized = true;
 		fireFormEvent(new FormInitializedEvent(this));
 	}
 
 	protected ValidationResult validate() {
-		if (getValidator() != null) {
+		if (this.initialized && getValidator() != null) {
 			ValidationResult validationResult = getValidator().validate(this.propertyMap);
 			return validationResult;
 		} else {
@@ -353,7 +354,6 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 		return propertyMap;
 	}
 
-	@SuppressWarnings("unchecked")
 	private void read() {
 		for (String key : this.propertyMap.keySet()) {
 			// We're assuming we have a key in the form of property.index, for example password.0, where
@@ -372,12 +372,7 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 			} else {
 				value = this.objectWrappers.get(index).getValue(key.substring(0, lastIndex));
 			}
-			Converter converter = this.converters.get(key);
-			if (converter != null) {
-				this.propertyMap.put(key, converter.convertFrom(value));
-			} else {
-				this.propertyMap.put(key, value);
-			}
+			this.propertyMap.put(key, value);
 		}
 	}
 
@@ -388,15 +383,13 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 			int lastIndex = key.lastIndexOf(".");
 			int index = Integer.parseInt(key.substring(lastIndex + 1));
 			Object value = this.propertyMap.get(key);
-			Converter converter = this.converters.get(key);
+
 			if (getModel() instanceof Map) {
 				Map modelMap = (Map) model;
 				modelMap.put(key, value);
 				modelMap.put(key.substring(0, lastIndex), value);
 			} else {
-				if (converter != null) {
-					this.objectWrappers.get(index).setValue(key.substring(0, lastIndex), converter.convertTo(value));
-				} else {
+				if (this.objectWrappers.get(index).getProperty(key.substring(0, lastIndex)).isWritable()) {
 					this.objectWrappers.get(index).setValue(key.substring(0, lastIndex), value);
 				}
 			}

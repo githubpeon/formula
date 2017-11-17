@@ -54,4 +54,7 @@ public class FormController<T extends Object, U extends Object> extends DefaultF
 		return true;
 	}
 
+	protected void enableCommit(boolean enable, boolean requestFocus) {
+		getFormBinder().enable(enable, requestFocus);
+	}
 }

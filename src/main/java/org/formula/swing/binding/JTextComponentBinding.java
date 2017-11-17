@@ -7,11 +7,12 @@ import javax.swing.text.JTextComponent;
 import org.formula.binding.FormBinder;
 import org.formula.binding.FormFieldBinding;
 import org.formula.binding.PropertyMap;
+import org.formula.converter.Converter;
 
 public class JTextComponentBinding extends FormFieldBinding<JTextComponent> implements DocumentListener {
 
-	public JTextComponentBinding(JTextComponent jTextComponent, FormBinder formBinder, PropertyMap propertyMap, String property, String optionsProperty, boolean required) {
-		super(jTextComponent, formBinder, propertyMap, property, optionsProperty, required);
+	public JTextComponentBinding(JTextComponent jTextComponent, FormBinder formBinder, PropertyMap propertyMap, String property, String optionsProperty, boolean required, Converter converter) {
+		super(jTextComponent, formBinder, propertyMap, property, optionsProperty, required, converter);
 		jTextComponent.getDocument().addDocumentListener(this);
 	}
 
