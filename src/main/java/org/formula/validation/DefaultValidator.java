@@ -26,6 +26,7 @@ public class DefaultValidator implements Validator {
 		this.view = view;
 	}
 
+	@Override
 	public List<FieldValidator> getFieldValidators() {
 		return fieldValidators;
 	}

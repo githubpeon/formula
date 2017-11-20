@@ -21,6 +21,7 @@ public class SwingFormController<T extends Container, U extends Object> extends 
 		super.setForm(form);
 		FormBinder formBinder = new SwingFormBinder(form);
 		formBinder.addFormListener(this);
+		formBinder.addFormFieldListener(this);
 		formBinder.addFormValidationListener(this);
 		formBinder.setConfirmationHandler(this);
 		setFormBinder(formBinder);

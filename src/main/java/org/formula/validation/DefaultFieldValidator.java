@@ -8,6 +8,7 @@ public class DefaultFieldValidator implements FieldValidator {
 
 	private FormFieldBinding formFieldBinding;
 
+	@Override
 	public FormFieldBinding getFormFieldBinding() {
 		return formFieldBinding;
 	}

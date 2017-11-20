@@ -87,6 +87,7 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 		}
 		this.model = model;
 		init();
+		validate();
 	}
 
 	@Override
@@ -191,10 +192,12 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 	@Override
 	public void propertyChange(PropertyChangeEvent e) {
 		fireFormEvent(new FormPropertyEditedEvent(this, e.getPropertyName(), e.getOldValue(), e.getNewValue()));
-		ValidationResult validationResult = validate();
-		if (validationResult != null) {
-			fireFormValidationEvent(new FormEditValidationEvent(this, validationResult));
-		}
+        if(this.initialized) {
+    		ValidationResult validationResult = validate();
+    		if (validationResult != null) {
+    			fireFormValidationEvent(new FormEditValidationEvent(this, validationResult));
+    		}
+        }
 	}
 
 	protected void init() {

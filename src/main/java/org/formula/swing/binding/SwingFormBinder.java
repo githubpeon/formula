@@ -1,5 +1,6 @@
 package org.formula.swing.binding;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.event.FocusEvent;
@@ -35,6 +36,9 @@ import org.formula.binding.FormFieldBinding;
 import org.formula.converter.Converter;
 import org.formula.event.FormFieldFocusGainedEvent;
 import org.formula.event.FormFieldFocusLostEvent;
+import org.formula.validation.FieldValidator;
+import org.formula.validation.ValidationMessage;
+import org.formula.validation.ValidationResult;
 
 public class SwingFormBinder extends AbstractFormBinder implements FocusListener {
 
@@ -120,6 +124,32 @@ public class SwingFormBinder extends AbstractFormBinder implements FocusListener
 		}
 		return fields;
 	}
+
+	@Override
+    protected ValidationResult validate() {
+	    ValidationResult validationResult = super.validate();
+	    for(FieldValidator fieldValidator : getValidator().getFieldValidators()) {
+	        if(fieldValidator.getFormFieldBinding().getView() instanceof JComponent) {
+	            Object label = ((JComponent)fieldValidator.getFormFieldBinding().getView()).getClientProperty("labeledBy");
+	            if(label != null) {
+	                ((JLabel)label).setForeground(Color.BLACK);
+	            }
+	        }
+	    }
+	    if(validationResult != null) {
+            for(ValidationMessage validationMessage: validationResult.getPropertyValidationMessages()) {
+                Object view = validationMessage.getView();
+                if(view instanceof JComponent) {
+                  JComponent jComponent = (JComponent)view;
+                  Object label = jComponent.getClientProperty("labeledBy");
+                  if(label != null) {
+                      ((JLabel)label).setForeground(Color.RED);
+                  }
+                }
+            }
+	    }
+	    return validationResult;
+    }
 
 	@Override
 	public void focusGained(FocusEvent e) {
