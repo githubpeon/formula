@@ -12,9 +12,9 @@ public class IntegerConverter extends DefaultConverter {
 	public Object convertTo(Object value) {
 		try {
 			String valueString = (String) value;
-			return (valueString == null || valueString.isEmpty() ? 0 : Integer.decode(valueString));
+			return (valueString == null || valueString.isEmpty() ? null : Integer.decode(valueString));
 		} catch (NumberFormatException e) {
-			return 0;
+			return null;
 		}
 	}
 

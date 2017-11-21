@@ -16,6 +16,8 @@ public interface Validator {
 
 	public List<FieldValidator> getFieldValidators();
 
+	public List<FieldValidator> getFieldValidators(String property);
+
 	public ValidationResult validate(Map<String, Object> model);
 
 }

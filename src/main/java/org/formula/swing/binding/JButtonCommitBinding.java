@@ -22,6 +22,7 @@ import org.formula.event.FormPropertyEditedEvent;
 import org.formula.event.FormRefreshedEvent;
 import org.formula.event.FormRolledBackEvent;
 import org.formula.event.FormValidationListener;
+import org.formula.validation.ValidationError;
 import org.formula.validation.ValidationMessage;
 import org.formula.validation.ValidationResult;
 
@@ -37,6 +38,7 @@ public class JButtonCommitBinding extends FormBinding<JButton> implements Action
 		formBinder.addFormFieldListener(this);
 		formBinder.addFormValidationListener(this);
 		formBinder.addFormEnableListener(this);
+		this.defaultToolTipText = jButton.getToolTipText();
 	}
 
 	@Override
@@ -82,23 +84,39 @@ public class JButtonCommitBinding extends FormBinding<JButton> implements Action
 	@Override
 	public void formEditValidation(FormEditValidationEvent e) {
 		ValidationResult validationResult = e.getValidationResult();
-		if (!validationResult.isAllowCommit()) {
+		if (validationResult.hasPropertyErrors()
+				|| !validationResult.isAllowCommit()) {
 			getView().setEnabled(false);
-			if (this.defaultToolTipText == null) {
-				this.defaultToolTipText = getView().getToolTipText();
-			}
-			StringBuilder stringBuilder = new StringBuilder("<html>");
-			for (ValidationMessage validationMessage : validationResult.getFormValidationMessages()) {
-				stringBuilder.append(validationMessage.getMessage() + "<br>");
-			}
-			stringBuilder.append("</html>");
-			getView().setToolTipText(stringBuilder.toString());
+			updateToolTipText(validationResult);
 		} else if (validationResult.isMissingRequiredProperties()) {
 			getView().setEnabled(false);
+			updateToolTipText(null);
 		} else {
 			getView().setEnabled(true);
+			updateToolTipText(null);
+		}
+	}
+
+	private void updateToolTipText(ValidationResult validationResult) {
+		if (validationResult == null) {
 			getView().setToolTipText(this.defaultToolTipText);
-			this.defaultToolTipText = null;
+		} else {
+			getView().setEnabled(false);
+			StringBuilder stringBuilder = new StringBuilder();
+			for (ValidationMessage validationMessage : validationResult.getPropertyValidationMessages()) {
+				if (!validationMessage.getMessage().equals(ValidationError.REQUIRED_FIELD_MISSING)
+						&& !stringBuilder.toString().contains(validationMessage.getMessage().toString())) {
+					stringBuilder.append(validationMessage.getMessage() + "\n");
+				}
+			}
+			for (ValidationMessage validationMessage : validationResult.getFormValidationMessages()) {
+				stringBuilder.append(validationMessage.getMessage() + "\n");
+			}
+			if (!stringBuilder.toString().isEmpty()) {
+				getView().setToolTipText("<html>" + stringBuilder.toString().replace("\n", "<br>") + "</html>");
+			} else {
+				getView().setToolTipText(this.defaultToolTipText);
+			}
 		}
 	}
 

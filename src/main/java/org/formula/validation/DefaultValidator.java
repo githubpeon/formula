@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.formula.binding.FormBinding;
 
@@ -32,6 +34,21 @@ public class DefaultValidator implements Validator {
 	}
 
 	@Override
+	public List<FieldValidator> getFieldValidators(String property) {
+		Matcher matcher = Pattern.compile(".*\\.\\d*").matcher(property);
+		if (!matcher.matches()) {
+			property += ".0";
+		}
+		List<FieldValidator> propertyFieldValidators = new ArrayList<FieldValidator>();
+		for (FieldValidator fieldValidator : this.fieldValidators) {
+			if (fieldValidator.getFormFieldBinding().getProperty().equals(property)) {
+				propertyFieldValidators.add(fieldValidator);
+			}
+		}
+		return propertyFieldValidators;
+	}
+
+	@Override
 	public void addFieldValidator(FieldValidator fieldValidator) {
 		fieldValidators.add(fieldValidator);
 	}
@@ -48,9 +65,9 @@ public class DefaultValidator implements Validator {
 	@Override
 	public ValidationResult validate(Map<String, Object> model) {
 		ValidationResult validationResult = validateFields(model, new ValidationResult());
-		if (!validationResult.hasErrors()) {
-			validationResult = validateForm(model, validationResult);
-		}
+		// if (!validationResult.hasErrors()) {
+		validationResult = validateForm(model, validationResult);
+		// }
 		return validationResult;
 	}
 
@@ -65,4 +82,5 @@ public class DefaultValidator implements Validator {
 	protected ValidationResult validateForm(Map<String, Object> model, ValidationResult validationResult) {
 		return validationResult;
 	}
+
 }

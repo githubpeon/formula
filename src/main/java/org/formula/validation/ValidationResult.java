@@ -1,7 +1,9 @@
 package org.formula.validation;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.formula.validation.ValidationMessage.Severity;
 
@@ -50,6 +52,17 @@ public class ValidationResult {
 			}
 		}
 		return null;
+	}
+
+	public void removePropertyValidationMessages(String property) {
+		Pattern pattern = Pattern.compile(property.replace(".", "\\.") + ".*");
+		Iterator<ValidationMessage> iterator = getPropertyValidationMessages().iterator();
+		while (iterator.hasNext()) {
+			ValidationMessage validationMessage = iterator.next();
+			if (pattern.matcher(validationMessage.getProperty()).matches()) {
+				iterator.remove();
+			}
+		}
 	}
 
 	public boolean hasFormErrors() {

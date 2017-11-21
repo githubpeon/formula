@@ -23,6 +23,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
+import javax.swing.UIManager;
 import javax.swing.text.JTextComponent;
 
 import org.formula.annotation.CommitForm;
@@ -126,30 +127,34 @@ public class SwingFormBinder extends AbstractFormBinder implements FocusListener
 	}
 
 	@Override
-    protected ValidationResult validate() {
-	    ValidationResult validationResult = super.validate();
-	    for(FieldValidator fieldValidator : getValidator().getFieldValidators()) {
-	        if(fieldValidator.getFormFieldBinding().getView() instanceof JComponent) {
-	            Object label = ((JComponent)fieldValidator.getFormFieldBinding().getView()).getClientProperty("labeledBy");
-	            if(label != null) {
-	                ((JLabel)label).setForeground(Color.BLACK);
-	            }
-	        }
-	    }
-	    if(validationResult != null) {
-            for(ValidationMessage validationMessage: validationResult.getPropertyValidationMessages()) {
-                Object view = validationMessage.getView();
-                if(view instanceof JComponent) {
-                  JComponent jComponent = (JComponent)view;
-                  Object label = jComponent.getClientProperty("labeledBy");
-                  if(label != null) {
-                      ((JLabel)label).setForeground(Color.RED);
-                  }
-                }
-            }
-	    }
-	    return validationResult;
-    }
+	protected ValidationResult validate() {
+		ValidationResult validationResult = super.validate();
+		Color color = (Color) UIManager.getLookAndFeelDefaults().get("Label.foreground");
+
+		for (FieldValidator fieldValidator : getValidator().getFieldValidators()) {
+			Object view = fieldValidator.getFormFieldBinding().getView();
+			if (view instanceof JComponent) {
+				Object labeledBy = ((JComponent) view).getClientProperty("labeledBy");
+				if (labeledBy instanceof JComponent) {
+					((JComponent) labeledBy).setForeground(color);
+				}
+			}
+		}
+		if (validationResult != null) {
+			for (ValidationMessage validationMessage : validationResult.getPropertyValidationMessages()) {
+				for (FieldValidator fieldValidator : getValidator().getFieldValidators(validationMessage.getProperty())) {
+					Object view = fieldValidator.getFormFieldBinding().getView();
+					if (view instanceof JComponent) {
+						Object labeledBy = ((JComponent) view).getClientProperty("labeledBy");
+						if (labeledBy != null) {
+							((JComponent) labeledBy).setForeground(Color.RED);
+						}
+					}
+				}
+			}
+		}
+		return validationResult;
+	}
 
 	@Override
 	public void focusGained(FocusEvent e) {
