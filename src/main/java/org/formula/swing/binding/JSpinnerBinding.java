@@ -55,4 +55,9 @@ public class JSpinnerBinding extends FormFieldBinding<JSpinner> implements Chang
 		write(getView().getValue());
 	}
 
+	@Override
+	public void enable(boolean enable) {
+		getView().setEnabled(enable);
+	}
+
 }

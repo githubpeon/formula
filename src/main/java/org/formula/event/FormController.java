@@ -40,6 +40,15 @@ public class FormController<T extends Object, U extends Object> extends DefaultF
 		this.formBinder.setModel(model);
 	}
 
+	protected Object getProperty(String property) {
+		return getProperty(property, 0);
+	}
+
+	protected Object getProperty(String property, int index) {
+		property = property + "." + index;
+		return this.formBinder.getProperty(property);
+	}
+
 	protected void setProperty(String property, Object value) {
 		setProperty(property, value, 0);
 	}
@@ -49,8 +58,17 @@ public class FormController<T extends Object, U extends Object> extends DefaultF
 		this.formBinder.setProperty(property, value);
 	}
 
+	protected void enableProperty(String property, boolean enable) {
+		enableProperty(property, enable, 0);
+	}
+
+	protected void enableProperty(String property, boolean enable, int index) {
+		property = property + "." + index;
+		this.formBinder.enableProperty(property, enable);
+	}
+
 	@Override
-	public boolean confirmCommit(Map<String, Object> propertyMap) {
+	public boolean confirmCommit(Map<String, Object> model) {
 		return true;
 	}
 

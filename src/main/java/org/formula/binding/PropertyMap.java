@@ -23,6 +23,16 @@ public class PropertyMap extends HashMap<String, Object> {
 	}
 
 	@Override
+	public boolean containsKey(Object key) {
+		String property = (String) key;
+		Matcher matcher = propertyPattern.matcher(property);
+		if (!matcher.matches()) {
+			property += ".0";
+		}
+		return super.containsKey(property);
+	}
+
+	@Override
 	public Object get(Object key) {
 		String property = (String) key;
 		Matcher matcher = propertyPattern.matcher(property);

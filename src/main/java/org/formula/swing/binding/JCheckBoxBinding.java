@@ -34,4 +34,9 @@ public class JCheckBoxBinding extends FormFieldBinding<JCheckBox> implements Act
 		write(getView().isSelected());
 	}
 
+	@Override
+	public void enable(boolean enable) {
+		getView().setEnabled(enable);
+	}
+
 }

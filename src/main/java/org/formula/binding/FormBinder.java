@@ -10,7 +10,11 @@ public interface FormBinder {
 
 	public void setModel(Object model);
 
+	public Object getProperty(String property);
+
 	public void setProperty(String property, Object value);
+
+	public void enableProperty(String property, boolean enable);
 
 	public void refresh();
 

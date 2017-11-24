@@ -35,4 +35,9 @@ public class JRadioButtonBinding extends FormFieldBinding<JRadioButton> implemen
 		write(getView().getActionCommand());
 	}
 
+	@Override
+	public void enable(boolean enable) {
+		getView().setEnabled(enable);
+	}
+
 }

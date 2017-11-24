@@ -35,4 +35,9 @@ public class JColorChooserBinding extends FormFieldBinding<JColorChooser> implem
 		write(getView().getColor());
 	}
 
+	@Override
+	public void enable(boolean enable) {
+		getView().setEnabled(enable);
+	}
+
 }

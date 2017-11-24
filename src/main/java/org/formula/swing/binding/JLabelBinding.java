@@ -32,4 +32,9 @@ public class JLabelBinding extends FormFieldBinding<JLabel> {
 		// We never want to write from labels.
 	}
 
+	@Override
+	public void enable(boolean enable) {
+		getView().setEnabled(enable);
+	}
+
 }

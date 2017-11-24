@@ -48,4 +48,9 @@ public class JListBinding extends FormFieldBinding<JList> implements ListSelecti
 		}
 	}
 
+	@Override
+	public void enable(boolean enable) {
+		getView().setEnabled(enable);
+	}
+
 }

@@ -32,7 +32,6 @@ import org.formula.event.FormRolledBackEvent;
 import org.formula.event.FormValidationListener;
 import org.formula.validation.ConfirmationHandler;
 import org.formula.validation.FieldValidator;
-import org.formula.validation.ValidationMessage;
 import org.formula.validation.ValidationResult;
 import org.formula.validation.Validator;
 import org.minimalcode.beans.ObjectWrapper;
@@ -62,8 +61,22 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 		bindForm();
 	}
 
+	@Override
+	public Object getProperty(String property) {
+		return this.propertyMap.get(property);
+	}
+
+	@Override
 	public void setProperty(String property, Object value) {
 		this.propertyMap.put(property, value);
+	}
+
+	@Override
+	public void enableProperty(String property, boolean enable) {
+		for (FieldValidator fieldValidator : getValidator().getFieldValidators(property)) {
+			FormFieldBinding formFieldBinding = fieldValidator.getFormFieldBinding();
+			formFieldBinding.enable(enable);
+		}
 	}
 
 	protected Object getForm() {
@@ -192,12 +205,12 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 	@Override
 	public void propertyChange(PropertyChangeEvent e) {
 		fireFormEvent(new FormPropertyEditedEvent(this, e.getPropertyName(), e.getOldValue(), e.getNewValue()));
-        if(this.initialized) {
-    		ValidationResult validationResult = validate();
-    		if (validationResult != null) {
-    			fireFormValidationEvent(new FormEditValidationEvent(this, validationResult));
-    		}
-        }
+		if (this.initialized) {
+			ValidationResult validationResult = validate();
+			if (validationResult != null) {
+				fireFormValidationEvent(new FormEditValidationEvent(this, validationResult));
+			}
+		}
 	}
 
 	protected void init() {
@@ -221,16 +234,7 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 		fireFormValidationEvent(new FormCommitValidationEvent(this, validationResult));
 		if (!validationResult.hasErrors() && (this.confirmationHandler == null || this.confirmationHandler.confirmCommit(this.propertyMap))) {
 			write();
-			System.out.println("Commit: " + propertyMap + " to " + getModel());
 			fireFormEvent(new FormCommittedEvent(this));
-		} else {
-			// TODO: Remove this
-			for (ValidationMessage message : validationResult.getFormValidationMessages()) {
-				System.out.println(message);
-			}
-			for (ValidationMessage message : validationResult.getPropertyValidationMessages()) {
-				System.out.println(message.getProperty() + " == " + message);
-			}
 		}
 	}
 

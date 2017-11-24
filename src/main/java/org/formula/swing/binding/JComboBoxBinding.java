@@ -46,4 +46,9 @@ public class JComboBoxBinding extends FormFieldBinding<JComboBox> implements Act
 		write(getView().getSelectedItem());
 	}
 
+	@Override
+	public void enable(boolean enable) {
+		getView().setEnabled(enable);
+	}
+
 }

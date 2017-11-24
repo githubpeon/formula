@@ -33,4 +33,9 @@ public class JSliderBinding extends FormFieldBinding<JSlider> implements ChangeL
 		write(getView().getValue());
 	}
 
+	@Override
+	public void enable(boolean enable) {
+		getView().setEnabled(enable);
+	}
+
 }

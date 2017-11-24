@@ -45,4 +45,9 @@ public class JTextComponentBinding extends FormFieldBinding<JTextComponent> impl
 		// We don't care about this.
 	}
 
+	@Override
+	public void enable(boolean enable) {
+		getView().setEnabled(enable);
+	}
+
 }

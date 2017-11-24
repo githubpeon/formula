@@ -23,4 +23,9 @@ public class JProgressBarBinding extends FormFieldBinding<JProgressBar> {
 
 	}
 
+	@Override
+	public void enable(boolean enable) {
+		getView().setEnabled(enable);
+	}
+
 }
