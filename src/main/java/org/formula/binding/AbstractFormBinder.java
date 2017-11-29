@@ -310,7 +310,9 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 		for (Object listener : listeners) {
 			FormListener formListener = (FormListener) listener;
 			if (e instanceof FormPropertyEditedEvent) {
-				formListener.formPropertyEdited((FormPropertyEditedEvent) e);
+				if (this.initialized) {
+					formListener.formPropertyEdited((FormPropertyEditedEvent) e);
+				}
 			} else if (e instanceof FormInitializedEvent) {
 				formListener.formInitialized((FormInitializedEvent) e);
 			} else if (e instanceof FormRefreshedEvent) {
