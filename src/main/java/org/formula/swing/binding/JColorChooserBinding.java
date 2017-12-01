@@ -13,8 +13,8 @@ import org.formula.converter.Converter;
 
 public class JColorChooserBinding extends FormFieldBinding<JColorChooser> implements ChangeListener {
 
-	public JColorChooserBinding(JColorChooser jColorChooser, FormBinder formBinder, PropertyMap propertyMap, String property, String optionsProperty, boolean required, Converter converter) {
-		super(jColorChooser, formBinder, propertyMap, property, optionsProperty, required, converter);
+	public JColorChooserBinding(JColorChooser jColorChooser, FormBinder formBinder, PropertyMap propertyMap, String property, String labelProperty, String optionsProperty, boolean required, Converter converter) {
+		super(jColorChooser, formBinder, propertyMap, property, labelProperty, optionsProperty, required, converter);
 		jColorChooser.getSelectionModel().addChangeListener(this);
 	}
 
@@ -23,6 +23,11 @@ public class JColorChooserBinding extends FormFieldBinding<JColorChooser> implem
 		if (getPropertyValue() != null) {
 			getView().setColor((Color) getPropertyValue());
 		}
+	}
+
+	@Override
+	protected void doReadLabel() {
+
 	}
 
 	@Override

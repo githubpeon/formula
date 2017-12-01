@@ -178,12 +178,17 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 				throw new BindingException(e.getClass().getName() + " when creating converter " + converterClass.getName() + ".", e);
 			}
 
+			String labelProperty = formFieldAnnotation.labelProperty();
+			if (!labelProperty.isEmpty()) {
+				labelProperty = labelProperty + "." + classContainers.indexOf(container);
+			}
+
 			String optionsProperty = formFieldAnnotation.optionsProperty();
 			if (!optionsProperty.isEmpty()) {
 				optionsProperty = optionsProperty + "." + classContainers.indexOf(container);
 			}
 
-			FormFieldBinding formFieldBinding = bindFormField(formField, property, optionsProperty, required, converter);
+			FormFieldBinding formFieldBinding = bindFormField(formField, property, labelProperty, optionsProperty, required, converter);
 
 			Class validatorClass = formFieldAnnotation.validator();
 			try {
@@ -200,7 +205,7 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 		}
 	}
 
-	protected abstract FormFieldBinding bindFormField(Object formField, String property, String optionsProperty, boolean required, Converter converter);
+	protected abstract FormFieldBinding bindFormField(Object formField, String property, String labelProperty, String optionsProperty, boolean required, Converter converter);
 
 	@Override
 	public void propertyChange(PropertyChangeEvent e) {

@@ -13,14 +13,19 @@ import org.formula.converter.Converter;
 
 public class JComboBoxBinding extends FormFieldBinding<JComboBox> implements ActionListener {
 
-	public JComboBoxBinding(JComboBox jComboBox, FormBinder formBinder, PropertyMap propertyMap, String property, String optionsProperty, boolean required, Converter converter) {
-		super(jComboBox, formBinder, propertyMap, property, optionsProperty, required, converter);
+	public JComboBoxBinding(JComboBox jComboBox, FormBinder formBinder, PropertyMap propertyMap, String property, String labelProperty, String optionsProperty, boolean required, Converter converter) {
+		super(jComboBox, formBinder, propertyMap, property, labelProperty, optionsProperty, required, converter);
 		jComboBox.addActionListener(this);
 	}
 
 	@Override
 	protected void doRead() {
 		getView().setSelectedItem(getPropertyValue());
+	}
+
+	@Override
+	protected void doReadLabel() {
+
 	}
 
 	@Override

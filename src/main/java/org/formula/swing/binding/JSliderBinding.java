@@ -11,8 +11,8 @@ import org.formula.converter.Converter;
 
 public class JSliderBinding extends FormFieldBinding<JSlider> implements ChangeListener {
 
-	public JSliderBinding(JSlider jSlider, FormBinder formBinder, PropertyMap propertyMap, String property, String optionsProperty, boolean required, Converter converter) {
-		super(jSlider, formBinder, propertyMap, property, optionsProperty, required, converter);
+	public JSliderBinding(JSlider jSlider, FormBinder formBinder, PropertyMap propertyMap, String property, String labelProperty, String optionsProperty, boolean required, Converter converter) {
+		super(jSlider, formBinder, propertyMap, property, labelProperty, optionsProperty, required, converter);
 		jSlider.addChangeListener(this);
 	}
 
@@ -21,6 +21,11 @@ public class JSliderBinding extends FormFieldBinding<JSlider> implements ChangeL
 		if (getPropertyValue() != null) {
 			getView().setValue((Integer) getPropertyValue());
 		}
+	}
+
+	@Override
+	protected void doReadLabel() {
+
 	}
 
 	@Override

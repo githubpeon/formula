@@ -8,6 +8,7 @@ import org.formula.converter.Converter;
 public abstract class FormFieldBinding<T extends Object> extends FormBinding<T> implements PropertyChangeListener {
 
 	private String property;
+	private String labelProperty;
 	private String optionsProperty;
 	private PropertyMap propertyMap;
 	private boolean required;
@@ -16,16 +17,21 @@ public abstract class FormFieldBinding<T extends Object> extends FormBinding<T> 
 	private boolean reading;
 	private boolean writing;
 
-	public FormFieldBinding(T view, FormBinder formBinder, PropertyMap propertyMap, String property, String optionsProperty, boolean required, Converter converter) {
+	public FormFieldBinding(T view, FormBinder formBinder, PropertyMap propertyMap, String property, String labelProperty, String optionsProperty, boolean required, Converter converter) {
 		super(view, formBinder);
 		this.propertyMap = propertyMap;
 		this.property = property;
+		this.labelProperty = labelProperty;
 		this.optionsProperty = optionsProperty;
 		this.required = required;
 		this.converter = converter;
 
 		this.propertyMap.put(property, null);
 		propertyMap.addPropertyChangeListener(property, this);
+		if (!labelProperty.isEmpty()) {
+			this.propertyMap.put(labelProperty, null);
+			propertyMap.addPropertyChangeListener(labelProperty, this);
+		}
 		if (!optionsProperty.isEmpty()) {
 			this.propertyMap.put(optionsProperty, null);
 			propertyMap.addPropertyChangeListener(optionsProperty, this);
@@ -42,6 +48,10 @@ public abstract class FormFieldBinding<T extends Object> extends FormBinding<T> 
 		return property;
 	}
 
+	public String getLabelProperty() {
+		return this.labelProperty;
+	}
+
 	public String getOptionsProperty() {
 		return this.optionsProperty;
 	}
@@ -49,6 +59,10 @@ public abstract class FormFieldBinding<T extends Object> extends FormBinding<T> 
 	@SuppressWarnings("unchecked")
 	public Object getPropertyValue() {
 		return this.converter.convertFrom(this.propertyMap.get(this.property));
+	}
+
+	public Object getLabelPropertyValue() {
+		return this.propertyMap.get(this.labelProperty);
 	}
 
 	public Object getOptionsPropertyValue() {
@@ -94,6 +108,12 @@ public abstract class FormFieldBinding<T extends Object> extends FormBinding<T> 
 
 	protected abstract void doReadOptions();
 
+	protected void readLabel() {
+		doReadLabel();
+	}
+
+	protected abstract void doReadLabel();
+
 	@SuppressWarnings("unchecked")
 	protected void write(Object value) {
 		if (!this.reading) {
@@ -107,6 +127,9 @@ public abstract class FormFieldBinding<T extends Object> extends FormBinding<T> 
 	public void propertyChange(PropertyChangeEvent e) {
 		if (e.getPropertyName().equals(this.property)) {
 			read();
+		}
+		if (e.getPropertyName().equals(this.labelProperty)) {
+			readLabel();
 		}
 		if (e.getPropertyName().equals(this.optionsProperty)) {
 			readOptions();

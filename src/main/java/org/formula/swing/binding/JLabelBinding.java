@@ -9,17 +9,29 @@ import org.formula.converter.Converter;
 
 public class JLabelBinding extends FormFieldBinding<JLabel> {
 
-	public JLabelBinding(JLabel jList, FormBinder formBinder, PropertyMap propertyMap, String property, String optionsProperty, boolean required, Converter converter) {
-		super(jList, formBinder, propertyMap, property, optionsProperty, required, converter);
+	private String pattern = "";
+
+	public JLabelBinding(JLabel jLabel, FormBinder formBinder, PropertyMap propertyMap, String property, String labelProperty, String optionsProperty, boolean required, Converter converter) {
+		super(jLabel, formBinder, propertyMap, property, labelProperty, optionsProperty, required, converter);
+		this.pattern = jLabel.getText();
 	}
 
 	@Override
 	protected void doRead() {
 		if (getPropertyValue() != null) {
-			getView().setText(getPropertyValue().toString());
+			if (!this.pattern.isEmpty()) {
+				getView().setText(String.format(this.pattern, getPropertyValue()));
+			} else {
+				getView().setText(getPropertyValue().toString());
+			}
 		} else {
 			getView().setText("");
 		}
+	}
+
+	@Override
+	protected void doReadLabel() {
+
 	}
 
 	@Override

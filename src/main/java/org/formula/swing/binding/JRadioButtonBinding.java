@@ -12,8 +12,8 @@ import org.formula.converter.Converter;
 
 public class JRadioButtonBinding extends FormFieldBinding<JRadioButton> implements ActionListener {
 
-	public JRadioButtonBinding(JRadioButton jRadioButton, FormBinder formBinder, PropertyMap propertyMap, String property, String optionsProperty, boolean required, Converter converter) {
-		super(jRadioButton, formBinder, propertyMap, property, optionsProperty, required, converter);
+	public JRadioButtonBinding(JRadioButton jRadioButton, FormBinder formBinder, PropertyMap propertyMap, String property, String labelProperty, String optionsProperty, boolean required, Converter converter) {
+		super(jRadioButton, formBinder, propertyMap, property, labelProperty, optionsProperty, required, converter);
 		jRadioButton.addActionListener(this);
 	}
 
@@ -23,6 +23,11 @@ public class JRadioButtonBinding extends FormFieldBinding<JRadioButton> implemen
 		if (value != null && String.valueOf(value).equals(getView().getActionCommand())) {
 			getView().setSelected(true);
 		}
+	}
+
+	@Override
+	protected void doReadLabel() {
+
 	}
 
 	@Override

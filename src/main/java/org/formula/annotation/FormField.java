@@ -14,6 +14,8 @@ public @interface FormField {
 
 	String property();
 
+	String labelProperty() default "";
+
 	String optionsProperty() default "";
 
 	boolean required() default false;

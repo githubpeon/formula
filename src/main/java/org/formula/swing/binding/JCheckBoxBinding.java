@@ -12,9 +12,12 @@ import org.formula.converter.Converter;
 
 public class JCheckBoxBinding extends FormFieldBinding<JCheckBox> implements ActionListener {
 
-	public JCheckBoxBinding(JCheckBox jCheckBox, FormBinder formBinder, PropertyMap propertyMap, String property, String optionsProperty, boolean required, Converter converter) {
-		super(jCheckBox, formBinder, propertyMap, property, optionsProperty, required, converter);
+	private String pattern = "";
+
+	public JCheckBoxBinding(JCheckBox jCheckBox, FormBinder formBinder, PropertyMap propertyMap, String property, String labelProperty, String optionsProperty, boolean required, Converter converter) {
+		super(jCheckBox, formBinder, propertyMap, property, labelProperty, optionsProperty, required, converter);
 		jCheckBox.addActionListener(this);
+		this.pattern = jCheckBox.getText();
 	}
 
 	@Override
@@ -22,6 +25,11 @@ public class JCheckBoxBinding extends FormFieldBinding<JCheckBox> implements Act
 		if (getPropertyValue() != null) {
 			getView().setSelected((Boolean) getPropertyValue());
 		}
+	}
+
+	@Override
+	protected void doReadLabel() {
+		getView().setText(String.format(this.pattern, getLabelPropertyValue()));
 	}
 
 	@Override
