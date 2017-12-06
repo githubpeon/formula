@@ -11,8 +11,8 @@ import org.formula.converter.Converter;
 
 public class JSliderBinding extends FormFieldBinding<JSlider> implements ChangeListener {
 
-	public JSliderBinding(JSlider jSlider, FormBinder formBinder, PropertyMap propertyMap, String property, String labelProperty, String optionsProperty, boolean required, Converter converter) {
-		super(jSlider, formBinder, propertyMap, property, labelProperty, optionsProperty, required, converter);
+	public JSliderBinding(JSlider jSlider, FormBinder formBinder, PropertyMap propertyMap, String property, String[] labelProperties, String optionsProperty, boolean required, Converter converter) {
+		super(jSlider, formBinder, propertyMap, property, labelProperties, optionsProperty, required, converter);
 		jSlider.addChangeListener(this);
 	}
 

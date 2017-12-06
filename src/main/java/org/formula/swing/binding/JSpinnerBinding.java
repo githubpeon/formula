@@ -15,8 +15,8 @@ import org.formula.converter.Converter;
 
 public class JSpinnerBinding extends FormFieldBinding<JSpinner> implements ChangeListener {
 
-	public JSpinnerBinding(JSpinner jSpinner, FormBinder formBinder, PropertyMap propertyMap, String property, String labelProperty, String optionsProperty, boolean required, Converter converter) {
-		super(jSpinner, formBinder, propertyMap, property, labelProperty, optionsProperty, required, converter);
+	public JSpinnerBinding(JSpinner jSpinner, FormBinder formBinder, PropertyMap propertyMap, String property, String[] labelProperties, String optionsProperty, boolean required, Converter converter) {
+		super(jSpinner, formBinder, propertyMap, property, labelProperties, optionsProperty, required, converter);
 		jSpinner.addChangeListener(this);
 	}
 

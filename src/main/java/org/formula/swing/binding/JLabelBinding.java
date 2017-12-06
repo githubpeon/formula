@@ -11,27 +11,32 @@ public class JLabelBinding extends FormFieldBinding<JLabel> {
 
 	private String pattern = "";
 
-	public JLabelBinding(JLabel jLabel, FormBinder formBinder, PropertyMap propertyMap, String property, String labelProperty, String optionsProperty, boolean required, Converter converter) {
-		super(jLabel, formBinder, propertyMap, property, labelProperty, optionsProperty, required, converter);
+	public JLabelBinding(JLabel jLabel, FormBinder formBinder, PropertyMap propertyMap, String property, String[] labelProperties, String optionsProperty, boolean required, Converter converter) {
+		super(jLabel, formBinder, propertyMap, property, labelProperties, optionsProperty, required, converter);
 		this.pattern = jLabel.getText();
 	}
 
 	@Override
 	protected void doRead() {
-		if (getPropertyValue() != null) {
-			if (!this.pattern.isEmpty()) {
-				getView().setText(String.format(this.pattern, getPropertyValue()));
-			} else {
-				getView().setText(getPropertyValue().toString());
-			}
-		} else {
-			getView().setText("");
-		}
+        if (getPropertyValue() != null) {
+            getView().setText(getPropertyValue().toString());
+        } else {
+            getView().setText("");
+        }
 	}
 
 	@Override
 	protected void doReadLabel() {
-
+	    String [] labelProperties = getLabelProperties();
+	    if(labelProperties != null && labelProperties.length > 0) {
+	        Object[] labelPropertyValues = new Object[getLabelProperties().length];
+	        for(int i = 0; i < labelProperties.length; ++i) {
+	            labelPropertyValues[i] = getPropertyValue(labelProperties[i]);
+	        }
+	        getView().setText(String.format(this.pattern, labelPropertyValues));
+	    } else {
+	        getView().setText(this.pattern);
+	    }
 	}
 
 	@Override

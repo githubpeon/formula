@@ -12,9 +12,9 @@ import org.formula.validation.DefaultFieldValidator;
 @Target(ElementType.FIELD)
 public @interface FormField {
 
-	String property();
+	String property() default "";
 
-	String labelProperty() default "";
+    String[] labelProperties() default {};
 
 	String optionsProperty() default "";
 

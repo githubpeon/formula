@@ -8,7 +8,7 @@ import org.formula.converter.Converter;
 public abstract class FormFieldBinding<T extends Object> extends FormBinding<T> implements PropertyChangeListener {
 
 	private String property;
-	private String labelProperty;
+	private String[] labelProperties;
 	private String optionsProperty;
 	private PropertyMap propertyMap;
 	private boolean required;
@@ -17,18 +17,22 @@ public abstract class FormFieldBinding<T extends Object> extends FormBinding<T> 
 	private boolean reading;
 	private boolean writing;
 
-	public FormFieldBinding(T view, FormBinder formBinder, PropertyMap propertyMap, String property, String labelProperty, String optionsProperty, boolean required, Converter converter) {
+	public FormFieldBinding(T view, FormBinder formBinder, PropertyMap propertyMap, String property, String[] labelProperties, String optionsProperty, boolean required, Converter converter) {
 		super(view, formBinder);
 		this.propertyMap = propertyMap;
 		this.property = property;
-		this.labelProperty = labelProperty;
+		this.labelProperties = labelProperties;
 		this.optionsProperty = optionsProperty;
 		this.required = required;
 		this.converter = converter;
 
-		this.propertyMap.put(property, null);
-		propertyMap.addPropertyChangeListener(property, this);
-		if (!labelProperty.isEmpty()) {
+		// This means the property field is empty and has had a '.0' or whatever added to it.
+		if(!property.startsWith(".")) {
+    		this.propertyMap.put(property, null);
+    		propertyMap.addPropertyChangeListener(property, this);
+		}
+
+		for(String labelProperty : labelProperties) {
 			this.propertyMap.put(labelProperty, null);
 			propertyMap.addPropertyChangeListener(labelProperty, this);
 		}
@@ -48,8 +52,8 @@ public abstract class FormFieldBinding<T extends Object> extends FormBinding<T> 
 		return property;
 	}
 
-	public String getLabelProperty() {
-		return this.labelProperty;
+	public String[] getLabelProperties() {
+		return this.labelProperties;
 	}
 
 	public String getOptionsProperty() {
@@ -58,11 +62,11 @@ public abstract class FormFieldBinding<T extends Object> extends FormBinding<T> 
 
 	@SuppressWarnings("unchecked")
 	public Object getPropertyValue() {
-		return this.converter.convertFrom(this.propertyMap.get(this.property));
+		return getPropertyValue(this.property);
 	}
 
-	public Object getLabelPropertyValue() {
-		return this.propertyMap.get(this.labelProperty);
+	public Object getPropertyValue(String property) {
+	    return this.converter.convertFrom(this.propertyMap.get(property));
 	}
 
 	public Object getOptionsPropertyValue() {
@@ -128,8 +132,10 @@ public abstract class FormFieldBinding<T extends Object> extends FormBinding<T> 
 		if (e.getPropertyName().equals(this.property)) {
 			read();
 		}
-		if (e.getPropertyName().equals(this.labelProperty)) {
-			readLabel();
+		for(String labelProperty : this.labelProperties) {
+    		if (e.getPropertyName().equals(labelProperty)) {
+    			readLabel();
+    		}
 		}
 		if (e.getPropertyName().equals(this.optionsProperty)) {
 			readOptions();

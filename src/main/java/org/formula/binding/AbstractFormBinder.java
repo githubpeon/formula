@@ -154,7 +154,6 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 			Object formField = field.get(container);
 			FormField formFieldAnnotation = field.getAnnotation(FormField.class);
 
-			String property = formFieldAnnotation.property();
 			// We add the index of the container to the property key so we can have multiple copies of the same
 			// container in one and the same form. We're going to assume the model is an Iterable when
 			// we have multiple copies.
@@ -166,21 +165,25 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 			if (!classContainers.contains(container)) {
 				classContainers.add(container);
 			}
-			property += "." + classContainers.indexOf(container);
+
+			String property = formFieldAnnotation.property();
+			String indexedProperty = property + "." + classContainers.indexOf(container);
 
 			boolean required = formFieldAnnotation.required();
 			Converter converter = null;
 			Class converterClass = formFieldAnnotation.converter();
 			try {
 				converter = (Converter) converterClass.newInstance();
-				addConverter(property, converter);
+				if(!property.isEmpty()) {
+				    addConverter(indexedProperty, converter);
+				}
 			} catch (Exception e) {
 				throw new BindingException(e.getClass().getName() + " when creating converter " + converterClass.getName() + ".", e);
 			}
 
-			String labelProperty = formFieldAnnotation.labelProperty();
-			if (!labelProperty.isEmpty()) {
-				labelProperty = labelProperty + "." + classContainers.indexOf(container);
+			String[] labelProperties = formFieldAnnotation.labelProperties();
+			for(int i = 0; i < labelProperties.length; ++i) {
+				labelProperties[i] = labelProperties[i] + "." + classContainers.indexOf(container);
 			}
 
 			String optionsProperty = formFieldAnnotation.optionsProperty();
@@ -188,7 +191,7 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 				optionsProperty = optionsProperty + "." + classContainers.indexOf(container);
 			}
 
-			FormFieldBinding formFieldBinding = bindFormField(formField, property, labelProperty, optionsProperty, required, converter);
+			FormFieldBinding formFieldBinding = bindFormField(formField, indexedProperty, labelProperties, optionsProperty, required, converter);
 
 			Class validatorClass = formFieldAnnotation.validator();
 			try {
@@ -205,7 +208,7 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 		}
 	}
 
-	protected abstract FormFieldBinding bindFormField(Object formField, String property, String labelProperty, String optionsProperty, boolean required, Converter converter);
+	protected abstract FormFieldBinding bindFormField(Object formField, String property, String[] labelProperties, String optionsProperty, boolean required, Converter converter);
 
 	@Override
 	public void propertyChange(PropertyChangeEvent e) {

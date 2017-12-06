@@ -13,8 +13,8 @@ import org.formula.converter.Converter;
 
 public class JListBinding extends FormFieldBinding<JList> implements ListSelectionListener {
 
-	public JListBinding(JList jList, FormBinder formBinder, PropertyMap propertyMap, String property, String labelProperty, String optionsProperty, boolean required, Converter converter) {
-		super(jList, formBinder, propertyMap, property, labelProperty, optionsProperty, required, converter);
+	public JListBinding(JList jList, FormBinder formBinder, PropertyMap propertyMap, String property, String[] labelProperties, String optionsProperty, boolean required, Converter converter) {
+		super(jList, formBinder, propertyMap, property, labelProperties, optionsProperty, required, converter);
 		jList.addListSelectionListener(this);
 	}
 
