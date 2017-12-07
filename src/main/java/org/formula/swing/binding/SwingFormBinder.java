@@ -43,6 +43,10 @@ import org.formula.validation.ValidationResult;
 
 public class SwingFormBinder extends AbstractFormBinder implements FocusListener {
 
+	public SwingFormBinder() {
+		super();
+	}
+
 	public SwingFormBinder(Container form) {
 		super(form);
 	}

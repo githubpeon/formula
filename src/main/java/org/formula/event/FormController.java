@@ -29,6 +29,7 @@ public class FormController<T extends Object, U extends Object> extends DefaultF
 
 	public void setForm(T form) {
 		this.form = form;
+		getFormBinder().setForm(form);
 	}
 
 	public U getModel() {
@@ -74,5 +75,9 @@ public class FormController<T extends Object, U extends Object> extends DefaultF
 
 	protected void enableCommit(boolean enable, boolean requestFocus) {
 		getFormBinder().enable(enable, requestFocus);
+	}
+
+	protected void refresh() {
+		this.formBinder.refresh();
 	}
 }

@@ -43,22 +43,21 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 	private final Set<FormValidationListener> formValidationListeners = new HashSet<FormValidationListener>();
 	private final Set<FormEnableListener> formEnableListeners = new HashSet<FormEnableListener>();
 	private final PropertyMap propertyMap = new PropertyMap();
-	private final Object form;
 	private final Map<String, Converter> converters = new HashMap<String, Converter>();
 	private final List<ObjectWrapper> objectWrappers = new ArrayList<ObjectWrapper>();
 	private final Map<Class, List<Object>> containers = new HashMap<Class, List<Object>>();
+	private Object form;
 	private Object model;
 	private Validator validator;
 	private ConfirmationHandler confirmationHandler;
 	private boolean initialized = false;
 
+	public AbstractFormBinder() {
+
+	}
+
 	public AbstractFormBinder(Object form) {
-		if (!form.getClass().isAnnotationPresent(Form.class)) {
-			throw new BindingException(form.getClass().getName() + " does not have a @Form annotation.");
-		}
-		this.form = form;
-		propertyMap.addPropertyChangeListener(this);
-		bindForm();
+		setForm(form);
 	}
 
 	@Override
@@ -83,12 +82,27 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 		return this.form;
 	}
 
+	@Override
+	public void setForm(Object form) {
+		if (!form.getClass().isAnnotationPresent(Form.class)) {
+			throw new BindingException(form.getClass().getName() + " does not have a @Form annotation.");
+		} else if (this.form != null) {
+			throw new BindingException("FormBinder " + getClass().getName() + " is already bound to form " + this.form.getClass().getName() + ".");
+		}
+		this.form = form;
+		propertyMap.addPropertyChangeListener(this);
+		bindForm();
+	}
+
 	protected Object getModel() {
 		return model;
 	}
 
 	@Override
 	public void setModel(Object model) {
+		if (this.model != null) {
+			throw new BindingException("FormBinder " + getClass().getName() + " is already bound to model " + this.model.getClass().getName() + ".");
+		}
 		this.initialized = false;
 		if (model instanceof Collection) {
 			Iterator iterator = ((Collection) model).iterator();
@@ -174,15 +188,15 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 			Class converterClass = formFieldAnnotation.converter();
 			try {
 				converter = (Converter) converterClass.newInstance();
-				if(!property.isEmpty()) {
-				    addConverter(indexedProperty, converter);
+				if (!property.isEmpty()) {
+					addConverter(indexedProperty, converter);
 				}
 			} catch (Exception e) {
 				throw new BindingException(e.getClass().getName() + " when creating converter " + converterClass.getName() + ".", e);
 			}
 
 			String[] labelProperties = formFieldAnnotation.labelProperties();
-			for(int i = 0; i < labelProperties.length; ++i) {
+			for (int i = 0; i < labelProperties.length; ++i) {
 				labelProperties[i] = labelProperties[i] + "." + classContainers.indexOf(container);
 			}
 

@@ -8,6 +8,8 @@ import org.formula.validation.ConfirmationHandler;
 
 public interface FormBinder {
 
+	public void setForm(Object form);
+
 	public void setModel(Object model);
 
 	public Object getProperty(String property);

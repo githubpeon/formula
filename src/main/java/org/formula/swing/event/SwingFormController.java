@@ -9,16 +9,17 @@ import org.formula.swing.binding.SwingFormBinder;
 public class SwingFormController<T extends Container, U extends Object> extends FormController<T, U> {
 
 	public SwingFormController() {
+		FormBinder formBinder = new SwingFormBinder();
+		formBinder.addFormListener(this);
+		formBinder.addFormFieldListener(this);
+		formBinder.addFormValidationListener(this);
+		formBinder.setConfirmationHandler(this);
+		setFormBinder(formBinder);
 
 	}
 
 	public SwingFormController(T form) {
 		setForm(form);
-	}
-
-	@Override
-	public void setForm(T form) {
-		super.setForm(form);
 		FormBinder formBinder = new SwingFormBinder(form);
 		formBinder.addFormListener(this);
 		formBinder.addFormFieldListener(this);
