@@ -12,7 +12,7 @@ import org.formula.converter.Converter;
 
 public class JCheckBoxBinding extends FormFieldBinding<JCheckBox> implements ActionListener {
 
-	private String pattern = "";
+	private String pattern = null;
 
 	public JCheckBoxBinding(JCheckBox jCheckBox, FormBinder formBinder, PropertyMap propertyMap, String property, String[] labelProperties, String optionsProperty, boolean required, Converter converter) {
 		super(jCheckBox, formBinder, propertyMap, property, labelProperties, optionsProperty, required, converter);
@@ -29,16 +29,21 @@ public class JCheckBoxBinding extends FormFieldBinding<JCheckBox> implements Act
 
 	@Override
 	protected void doReadLabel() {
-        String [] labelProperties = getLabelProperties();
-        if(labelProperties != null && labelProperties.length > 0) {
-            Object[] labelPropertyValues = new Object[getLabelProperties().length];
-            for(int i = 0; i < labelProperties.length; ++i) {
-                labelPropertyValues[i] = getPropertyValue(labelProperties[i]);
-            }
-            getView().setText(String.format(this.pattern, labelPropertyValues));
-        } else {
-            getView().setText(this.pattern);
-        }
+		if (this.pattern != null) {
+			String[] labelProperties = getLabelProperties();
+			if (labelProperties != null && labelProperties.length > 0) {
+				Object[] labelPropertyValues = new Object[getLabelProperties().length];
+				for (int i = 0; i < labelProperties.length; ++i) {
+					labelPropertyValues[i] = getPropertyValue(labelProperties[i]);
+					if (labelPropertyValues[i] == null) {
+						labelPropertyValues[i] = "";
+					}
+				}
+				getView().setText(String.format(this.pattern, labelPropertyValues));
+			} else {
+				getView().setText(this.pattern);
+			}
+		}
 	}
 
 	@Override

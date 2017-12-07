@@ -27,12 +27,12 @@ public abstract class FormFieldBinding<T extends Object> extends FormBinding<T> 
 		this.converter = converter;
 
 		// This means the property field is empty and has had a '.0' or whatever added to it.
-		if(!property.startsWith(".")) {
-    		this.propertyMap.put(property, null);
-    		propertyMap.addPropertyChangeListener(property, this);
+		if (!property.startsWith(".")) {
+			this.propertyMap.put(property, null);
+			propertyMap.addPropertyChangeListener(property, this);
 		}
 
-		for(String labelProperty : labelProperties) {
+		for (String labelProperty : labelProperties) {
 			this.propertyMap.put(labelProperty, null);
 			propertyMap.addPropertyChangeListener(labelProperty, this);
 		}
@@ -60,13 +60,13 @@ public abstract class FormFieldBinding<T extends Object> extends FormBinding<T> 
 		return this.optionsProperty;
 	}
 
-	@SuppressWarnings("unchecked")
 	public Object getPropertyValue() {
 		return getPropertyValue(this.property);
 	}
 
+	@SuppressWarnings("unchecked")
 	public Object getPropertyValue(String property) {
-	    return this.converter.convertFrom(this.propertyMap.get(property));
+		return this.converter.convertFrom(this.propertyMap.get(property));
 	}
 
 	public Object getOptionsPropertyValue() {
@@ -132,10 +132,10 @@ public abstract class FormFieldBinding<T extends Object> extends FormBinding<T> 
 		if (e.getPropertyName().equals(this.property)) {
 			read();
 		}
-		for(String labelProperty : this.labelProperties) {
-    		if (e.getPropertyName().equals(labelProperty)) {
-    			readLabel();
-    		}
+		for (String labelProperty : this.labelProperties) {
+			if (e.getPropertyName().equals(labelProperty)) {
+				readLabel();
+			}
 		}
 		if (e.getPropertyName().equals(this.optionsProperty)) {
 			readOptions();
