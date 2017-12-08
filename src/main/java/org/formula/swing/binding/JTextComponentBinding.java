@@ -55,4 +55,9 @@ public class JTextComponentBinding extends FormFieldBinding<JTextComponent> impl
 		getView().setEnabled(enable);
 	}
 
+	@Override
+	public void focus() {
+		getView().requestFocusInWindow();
+	}
+
 }

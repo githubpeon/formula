@@ -59,4 +59,9 @@ public class JLabelBinding extends FormFieldBinding<JLabel> {
 		getView().setEnabled(enable);
 	}
 
+	@Override
+	public void focus() {
+		// Labels don't need to get focus.
+	}
+
 }

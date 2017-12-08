@@ -61,4 +61,9 @@ public class JCheckBoxBinding extends FormFieldBinding<JCheckBox> implements Act
 		getView().setEnabled(enable);
 	}
 
+	@Override
+	public void focus() {
+		getView().requestFocusInWindow();
+	}
+
 }

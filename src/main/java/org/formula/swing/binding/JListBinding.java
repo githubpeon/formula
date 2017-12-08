@@ -58,4 +58,9 @@ public class JListBinding extends FormFieldBinding<JList> implements ListSelecti
 		getView().setEnabled(enable);
 	}
 
+	@Override
+	public void focus() {
+		getView().requestFocusInWindow();
+	}
+
 }

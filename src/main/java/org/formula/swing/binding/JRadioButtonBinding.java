@@ -45,4 +45,9 @@ public class JRadioButtonBinding extends FormFieldBinding<JRadioButton> implemen
 		getView().setEnabled(enable);
 	}
 
+	@Override
+	public void focus() {
+		getView().requestFocusInWindow();
+	}
+
 }

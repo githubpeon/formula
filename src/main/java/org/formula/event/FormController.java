@@ -68,6 +68,15 @@ public class FormController<T extends Object, U extends Object> extends DefaultF
 		this.formBinder.enableProperty(property, enable);
 	}
 
+	protected void focusProperty(String property) {
+		focusProperty(property, 0);
+	}
+
+	protected void focusProperty(String property, int index) {
+		property = property + "." + index;
+		this.formBinder.focusProperty(property);
+	}
+
 	@Override
 	public boolean confirmCommit(Map<String, Object> model) {
 		return true;

@@ -45,4 +45,9 @@ public class JColorChooserBinding extends FormFieldBinding<JColorChooser> implem
 		getView().setEnabled(enable);
 	}
 
+	@Override
+	public void focus() {
+		getView().requestFocusInWindow();
+	}
+
 }

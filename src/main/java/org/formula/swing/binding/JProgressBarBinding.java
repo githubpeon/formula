@@ -33,4 +33,9 @@ public class JProgressBarBinding extends FormFieldBinding<JProgressBar> {
 		getView().setEnabled(enable);
 	}
 
+	@Override
+	public void focus() {
+		getView().requestFocusInWindow();
+	}
+
 }

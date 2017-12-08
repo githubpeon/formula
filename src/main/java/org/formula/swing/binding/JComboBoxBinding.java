@@ -56,4 +56,9 @@ public class JComboBoxBinding extends FormFieldBinding<JComboBox> implements Act
 		getView().setEnabled(enable);
 	}
 
+	@Override
+	public void focus() {
+		getView().requestFocusInWindow();
+	}
+
 }

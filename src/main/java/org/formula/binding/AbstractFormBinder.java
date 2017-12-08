@@ -78,6 +78,14 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 		}
 	}
 
+	@Override
+	public void focusProperty(String property) {
+		for (FieldValidator fieldValidator : getValidator().getFieldValidators(property)) {
+			FormFieldBinding formFieldBinding = fieldValidator.getFormFieldBinding();
+			formFieldBinding.focus();
+		}
+	}
+
 	protected Object getForm() {
 		return this.form;
 	}

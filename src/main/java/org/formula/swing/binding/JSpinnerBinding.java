@@ -65,4 +65,9 @@ public class JSpinnerBinding extends FormFieldBinding<JSpinner> implements Chang
 		getView().setEnabled(enable);
 	}
 
+	@Override
+	public void focus() {
+		getView().requestFocusInWindow();
+	}
+
 }

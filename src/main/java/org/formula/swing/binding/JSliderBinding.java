@@ -43,4 +43,9 @@ public class JSliderBinding extends FormFieldBinding<JSlider> implements ChangeL
 		getView().setEnabled(enable);
 	}
 
+	@Override
+	public void focus() {
+		getView().requestFocusInWindow();
+	}
+
 }
