@@ -5,11 +5,10 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.JTextComponent;
 
 import org.formula.binding.FormBinder;
-import org.formula.binding.FormFieldBinding;
 import org.formula.binding.PropertyMap;
 import org.formula.converter.Converter;
 
-public class JTextComponentBinding extends FormFieldBinding<JTextComponent> implements DocumentListener {
+public class JTextComponentBinding extends SwingFormFieldBinding<JTextComponent> implements DocumentListener {
 
 	public JTextComponentBinding(JTextComponent jTextComponent, FormBinder formBinder, PropertyMap propertyMap, String property, String[] labelProperties, String optionsProperty, boolean required, Converter converter) {
 		super(jTextComponent, formBinder, propertyMap, property, labelProperties, optionsProperty, required, converter);

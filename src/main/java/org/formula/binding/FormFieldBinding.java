@@ -44,6 +44,8 @@ public abstract class FormFieldBinding<T extends Object> extends FormBinding<T> 
 
 	public abstract void enable(boolean enable);
 
+	public abstract void show(boolean visible);
+
 	public abstract void focus();
 
 	public PropertyMap getPropertyMap() {

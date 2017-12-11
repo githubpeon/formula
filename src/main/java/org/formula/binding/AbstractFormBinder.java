@@ -46,6 +46,7 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 	private final Map<String, Converter> converters = new HashMap<String, Converter>();
 	private final List<ObjectWrapper> objectWrappers = new ArrayList<ObjectWrapper>();
 	private final Map<Class, List<Object>> containers = new HashMap<Class, List<Object>>();
+	private final Map<String, Set<FormFieldBinding>> formFieldBindings = new HashMap<String, Set<FormFieldBinding>>();
 	private Object form;
 	private Object model;
 	private Validator validator;
@@ -72,9 +73,11 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 
 	@Override
 	public void enableProperty(String property, boolean enable) {
-		for (FieldValidator fieldValidator : getValidator().getFieldValidators(property)) {
-			FormFieldBinding formFieldBinding = fieldValidator.getFormFieldBinding();
-			formFieldBinding.enable(enable);
+		Set<FormFieldBinding> formFieldBindings = this.formFieldBindings.get(property);
+		if (formFieldBindings != null) {
+			for (FormFieldBinding formFieldBinding : formFieldBindings) {
+				formFieldBinding.enable(enable);
+			}
 		}
 	}
 
@@ -83,6 +86,16 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 		for (FieldValidator fieldValidator : getValidator().getFieldValidators(property)) {
 			FormFieldBinding formFieldBinding = fieldValidator.getFormFieldBinding();
 			formFieldBinding.focus();
+		}
+	}
+
+	@Override
+	public void showProperty(String property, boolean visible) {
+		Set<FormFieldBinding> formFieldBindings = this.formFieldBindings.get(property);
+		if (formFieldBindings != null) {
+			for (FormFieldBinding formFieldBinding : formFieldBindings) {
+				formFieldBinding.show(visible);
+			}
 		}
 	}
 
@@ -222,6 +235,22 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 				getValidator().addFieldValidator(fieldValidator);
 			} catch (Exception e) {
 				throw new BindingException(e.getClass().getName() + " when creating validator " + validatorClass.getName() + ".", e);
+			}
+
+			Set<FormFieldBinding> formFieldBindingSet = this.formFieldBindings.get(indexedProperty);
+			if (formFieldBindingSet == null) {
+				formFieldBindingSet = new HashSet<FormFieldBinding>();
+				this.formFieldBindings.put(indexedProperty, formFieldBindingSet);
+			}
+			formFieldBindingSet.add(formFieldBinding);
+
+			for (String labelProperty : labelProperties) {
+				formFieldBindingSet = this.formFieldBindings.get(labelProperty);
+				if (formFieldBindingSet == null) {
+					formFieldBindingSet = new HashSet<FormFieldBinding>();
+					this.formFieldBindings.put(labelProperty, formFieldBindingSet);
+				}
+				formFieldBindingSet.add(formFieldBinding);
 			}
 
 			return formFieldBinding;

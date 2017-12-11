@@ -3,11 +3,10 @@ package org.formula.swing.binding;
 import javax.swing.JProgressBar;
 
 import org.formula.binding.FormBinder;
-import org.formula.binding.FormFieldBinding;
 import org.formula.binding.PropertyMap;
 import org.formula.converter.Converter;
 
-public class JProgressBarBinding extends FormFieldBinding<JProgressBar> {
+public class JProgressBarBinding extends SwingFormFieldBinding<JProgressBar> {
 
 	public JProgressBarBinding(JProgressBar jProgressBar, FormBinder formBinder, PropertyMap propertyMap, String property, String[] labelProperties, String optionsProperty, boolean required, Converter converter) {
 		super(jProgressBar, formBinder, propertyMap, property, labelProperties, optionsProperty, required, converter);

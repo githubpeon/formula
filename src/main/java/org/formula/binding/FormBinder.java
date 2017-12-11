@@ -18,6 +18,8 @@ public interface FormBinder {
 
 	public void enableProperty(String property, boolean enable);
 
+	public void showProperty(String property, boolean visible);
+
 	public void focusProperty(String property);
 
 	public void refresh();

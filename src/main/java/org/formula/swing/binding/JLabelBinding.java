@@ -3,11 +3,10 @@ package org.formula.swing.binding;
 import javax.swing.JLabel;
 
 import org.formula.binding.FormBinder;
-import org.formula.binding.FormFieldBinding;
 import org.formula.binding.PropertyMap;
 import org.formula.converter.Converter;
 
-public class JLabelBinding extends FormFieldBinding<JLabel> {
+public class JLabelBinding extends SwingFormFieldBinding<JLabel> {
 
 	private String pattern = null;
 

@@ -6,11 +6,10 @@ import java.awt.event.ActionListener;
 import javax.swing.JCheckBox;
 
 import org.formula.binding.FormBinder;
-import org.formula.binding.FormFieldBinding;
 import org.formula.binding.PropertyMap;
 import org.formula.converter.Converter;
 
-public class JCheckBoxBinding extends FormFieldBinding<JCheckBox> implements ActionListener {
+public class JCheckBoxBinding extends SwingFormFieldBinding<JCheckBox> implements ActionListener {
 
 	private String pattern = null;
 

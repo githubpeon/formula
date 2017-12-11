@@ -1,6 +1,5 @@
 package org.formula.swing.binding;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.event.FocusEvent;
@@ -23,7 +22,6 @@ import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
-import javax.swing.UIManager;
 import javax.swing.text.JTextComponent;
 
 import org.formula.annotation.CommitForm;
@@ -133,27 +131,16 @@ public class SwingFormBinder extends AbstractFormBinder implements FocusListener
 	@Override
 	protected ValidationResult validate() {
 		ValidationResult validationResult = super.validate();
-		Color color = (Color) UIManager.getLookAndFeelDefaults().get("Label.foreground");
 
 		for (FieldValidator fieldValidator : getValidator().getFieldValidators()) {
-			Object view = fieldValidator.getFormFieldBinding().getView();
-			if (view instanceof JComponent) {
-				Object labeledBy = ((JComponent) view).getClientProperty("labeledBy");
-				if (labeledBy instanceof JComponent) {
-					((JComponent) labeledBy).setForeground(color);
-				}
-			}
+			SwingFormFieldBinding swingFormFieldBinding = (SwingFormFieldBinding) fieldValidator.getFormFieldBinding();
+			swingFormFieldBinding.setValidationError(false);
 		}
 		if (validationResult != null) {
 			for (ValidationMessage validationMessage : validationResult.getPropertyValidationMessages()) {
 				for (FieldValidator fieldValidator : getValidator().getFieldValidators(validationMessage.getProperty())) {
-					Object view = fieldValidator.getFormFieldBinding().getView();
-					if (view instanceof JComponent) {
-						Object labeledBy = ((JComponent) view).getClientProperty("labeledBy");
-						if (labeledBy != null) {
-							((JComponent) labeledBy).setForeground(Color.RED);
-						}
-					}
+					SwingFormFieldBinding swingFormFieldBinding = (SwingFormFieldBinding) fieldValidator.getFormFieldBinding();
+					swingFormFieldBinding.setValidationError(true);
 				}
 			}
 		}

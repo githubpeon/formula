@@ -68,6 +68,15 @@ public class FormController<T extends Object, U extends Object> extends DefaultF
 		this.formBinder.enableProperty(property, enable);
 	}
 
+	protected void showProperty(String property, boolean visible) {
+		showProperty(property, visible, 0);
+	}
+
+	protected void showProperty(String property, boolean visible, int index) {
+		property = property + "." + index;
+		this.formBinder.showProperty(property, visible);
+	}
+
 	protected void focusProperty(String property) {
 		focusProperty(property, 0);
 	}

@@ -9,11 +9,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.formula.binding.FormBinder;
-import org.formula.binding.FormFieldBinding;
 import org.formula.binding.PropertyMap;
 import org.formula.converter.Converter;
 
-public class JSpinnerBinding extends FormFieldBinding<JSpinner> implements ChangeListener {
+public class JSpinnerBinding extends SwingFormFieldBinding<JSpinner> implements ChangeListener {
 
 	public JSpinnerBinding(JSpinner jSpinner, FormBinder formBinder, PropertyMap propertyMap, String property, String[] labelProperties, String optionsProperty, boolean required, Converter converter) {
 		super(jSpinner, formBinder, propertyMap, property, labelProperties, optionsProperty, required, converter);
