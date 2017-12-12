@@ -45,7 +45,7 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 	private final Map<String, Integer> indexMap = new HashMap<String, Integer>();
 	private Object form;
 	private Object model;
-	private ObjectWrapper objectWrapper;
+	private Map<Object, ObjectWrapper> objectWrappers = new HashMap<Object, ObjectWrapper>();
 	private Validator validator;
 	private ConfirmationHandler confirmationHandler;
 	private boolean initialized = false;
@@ -107,10 +107,22 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 	@Override
 	public void setModel(Object model) {
 		this.initialized = false;
-		if (!(model instanceof Map)) {
-			this.objectWrapper = new ObjectWrapper(model);
-		}
+		this.objectWrappers.clear();
 		this.model = model;
+
+		if (!(model instanceof Map)) {
+			this.objectWrappers.put(model, new ObjectWrapper(model));
+	        for (String key : this.propertyMap.keySet()) {
+                Matcher matcher = FormBinder.INDEXDED_PROPERTY_KEY_PATTERN.matcher(key);
+                if (matcher.matches()) {
+                    String indexKey = matcher.group(1);
+                    int index = Integer.valueOf(matcher.group(2));
+                    Object indexedModel = getIndexedValueAt(indexKey, index, getModel());
+                    this.objectWrappers.put(indexedModel, new ObjectWrapper(indexedModel));
+                }
+	        }
+		}
+
 		init();
 		validate();
 	}
@@ -383,13 +395,13 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 			} else {
 				Matcher matcher = FormBinder.INDEXDED_PROPERTY_KEY_PATTERN.matcher(key);
 				if (matcher.matches()) {
-					String iterableKey = matcher.group(1);
+					String indexKey = matcher.group(1);
 					int index = Integer.valueOf(matcher.group(2));
 					String property = matcher.group(3);
-					value = getIndexedValueAt(iterableKey, index, getModel());
-					value = new ObjectWrapper(value).getValue(property);
+					value = getIndexedValueAt(indexKey, index, getModel());
+					value = this.objectWrappers.get(value).getValue(property);
 				} else {
-					value = this.objectWrapper.getValue(key);
+					value = this.objectWrappers.get(getModel()).getValue(key);
 				}
 			}
 			this.propertyMap.put(key, value);
@@ -407,17 +419,16 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 			} else {
 				Matcher matcher = FormBinder.INDEXDED_PROPERTY_KEY_PATTERN.matcher(key);
 				if (matcher.matches()) {
-					String iterableKey = matcher.group(1);
+					String indexKey = matcher.group(1);
 					int index = Integer.valueOf(matcher.group(2));
 					String property = matcher.group(3);
-					Object indexedModel = getIndexedValueAt(iterableKey, index, getModel());
-					ObjectWrapper objectWrapper = new ObjectWrapper(indexedModel);
-					if (objectWrapper.getProperty(property).isWritable()) {
-						objectWrapper.setValue(property, value);
+					Object indexedModel = getIndexedValueAt(indexKey, index, getModel());
+					if (this.objectWrappers.get(indexedModel).getProperty(property).isWritable()) {
+					    this.objectWrappers.get(indexedModel).setValue(property, value);
 					}
 				} else {
-					if (this.objectWrapper.getProperty(key).isWritable()) {
-						this.objectWrapper.setValue(key, value);
+					if (this.objectWrappers.get(getModel()).getProperty(key).isWritable()) {
+						this.objectWrappers.get(getModel()).setValue(key, value);
 					}
 				}
 			}
