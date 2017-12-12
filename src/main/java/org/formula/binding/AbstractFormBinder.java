@@ -410,8 +410,11 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 					String iterableKey = matcher.group(1);
 					int index = Integer.valueOf(matcher.group(2));
 					String property = matcher.group(3);
-					value = getIndexedValueAt(iterableKey, index, getModel());
-					value = new ObjectWrapper(value).getValue(property);
+					Object indexedModel = getIndexedValueAt(iterableKey, index, getModel());
+					ObjectWrapper objectWrapper = new ObjectWrapper(indexedModel);
+					if (objectWrapper.getProperty(property).isWritable()) {
+						objectWrapper.setValue(property, value);
+					}
 				} else {
 					if (this.objectWrapper.getProperty(key).isWritable()) {
 						this.objectWrapper.setValue(key, value);
