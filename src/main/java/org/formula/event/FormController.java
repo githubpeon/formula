@@ -42,21 +42,19 @@ public class FormController<T extends Object, U extends Object> extends DefaultF
 	}
 
 	protected Object getProperty(String property) {
-		return getProperty(property, 0);
-	}
-
-	protected Object getProperty(String property, int index) {
-		property = property + "." + index;
 		return this.formBinder.getProperty(property);
 	}
 
+	protected Object getProperty(String property, int index) {
+		return this.formBinder.getProperty(property, index);
+	}
+
 	protected void setProperty(String property, Object value) {
-		setProperty(property, value, 0);
+		this.formBinder.setProperty(property, value);
 	}
 
 	protected void setProperty(String property, Object value, int index) {
-		property = property + "." + index;
-		this.formBinder.setProperty(property, value);
+		this.formBinder.setProperty(property, value, index);
 	}
 
 	protected void enableProperty(String property, boolean enable) {

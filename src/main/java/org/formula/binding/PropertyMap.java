@@ -19,18 +19,6 @@ public class PropertyMap extends HashMap<String, Object> {
 		return oldValue;
 	}
 
-	@Override
-	public boolean containsKey(Object key) {
-		String property = (String) key;
-		return super.containsKey(property);
-	}
-
-	@Override
-	public Object get(Object key) {
-		String property = (String) key;
-		return super.get(property);
-	}
-
 	public void addPropertyChangeListener(PropertyChangeListener propertyChangeListener) {
 		propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);
 	}

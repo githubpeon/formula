@@ -10,7 +10,7 @@ import org.formula.validation.ConfirmationHandler;
 
 public interface FormBinder {
 
-	public final static Pattern INDEXDED_PROPERTY_KEY_PATTERN = Pattern.compile("(.*)#(\\d*)\\.(.*)");
+	public final static Pattern INDEXDED_PROPERTY_KEY_PATTERN = Pattern.compile("((.*)\\.)?#(\\d*)\\.(.*)");
 
 	public void setForm(Object form);
 
@@ -18,7 +18,11 @@ public interface FormBinder {
 
 	public Object getProperty(String property);
 
+	public Object getProperty(String property, int index);
+
 	public void setProperty(String property, Object value);
+
+	public void setProperty(String property, Object value, int index);
 
 	public void enableProperty(String property, boolean enable);
 

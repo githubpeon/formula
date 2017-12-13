@@ -64,7 +64,19 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 	}
 
 	@Override
+	public Object getProperty(String property, int index) {
+		property = property.replaceFirst("#", "#" + index);
+		return getProperty(property);
+	}
+
+	@Override
 	public void setProperty(String property, Object value) {
+		this.propertyMap.put(property, value);
+	}
+
+	@Override
+	public void setProperty(String property, Object value, int index) {
+		property = property.replaceFirst("#", "#" + index);
 		this.propertyMap.put(property, value);
 	}
 
@@ -112,15 +124,15 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 
 		if (!(model instanceof Map)) {
 			this.objectWrappers.put(model, new ObjectWrapper(model));
-	        for (String key : this.propertyMap.keySet()) {
-                Matcher matcher = FormBinder.INDEXDED_PROPERTY_KEY_PATTERN.matcher(key);
-                if (matcher.matches()) {
-                    String indexKey = matcher.group(1);
-                    int index = Integer.valueOf(matcher.group(2));
-                    Object indexedModel = getIndexedValueAt(indexKey, index, getModel());
-                    this.objectWrappers.put(indexedModel, new ObjectWrapper(indexedModel));
-                }
-	        }
+			for (String key : this.propertyMap.keySet()) {
+				Matcher matcher = FormBinder.INDEXDED_PROPERTY_KEY_PATTERN.matcher(key);
+				if (matcher.matches()) {
+					String indexKey = matcher.group(2);
+					int index = Integer.valueOf(matcher.group(3));
+					Object indexedModel = getIndexedValueAt(indexKey, index, getModel());
+					this.objectWrappers.put(indexedModel, new ObjectWrapper(indexedModel));
+				}
+			}
 		}
 
 		init();
@@ -395,9 +407,9 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 			} else {
 				Matcher matcher = FormBinder.INDEXDED_PROPERTY_KEY_PATTERN.matcher(key);
 				if (matcher.matches()) {
-					String indexKey = matcher.group(1);
-					int index = Integer.valueOf(matcher.group(2));
-					String property = matcher.group(3);
+					String indexKey = matcher.group(2);
+					int index = Integer.valueOf(matcher.group(3));
+					String property = matcher.group(4);
 					value = getIndexedValueAt(indexKey, index, getModel());
 					value = this.objectWrappers.get(value).getValue(property);
 				} else {
@@ -419,12 +431,12 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 			} else {
 				Matcher matcher = FormBinder.INDEXDED_PROPERTY_KEY_PATTERN.matcher(key);
 				if (matcher.matches()) {
-					String indexKey = matcher.group(1);
-					int index = Integer.valueOf(matcher.group(2));
-					String property = matcher.group(3);
+					String indexKey = matcher.group(2);
+					int index = Integer.valueOf(matcher.group(3));
+					String property = matcher.group(4);
 					Object indexedModel = getIndexedValueAt(indexKey, index, getModel());
 					if (this.objectWrappers.get(indexedModel).getProperty(property).isWritable()) {
-					    this.objectWrappers.get(indexedModel).setValue(property, value);
+						this.objectWrappers.get(indexedModel).setValue(property, value);
 					}
 				} else {
 					if (this.objectWrappers.get(getModel()).getProperty(key).isWritable()) {
@@ -437,13 +449,17 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 
 	private Object getIndexedValueAt(String key, int index, Object model) {
 		Object value = null;
-		if (key.isEmpty()) {
-			Iterator iterator = ((Iterable) model).iterator();
-			for (int i = 0; i <= index; ++i) {
-				value = iterator.next();
+		if (key == null || key.isEmpty()) {
+			if (model instanceof Iterator) {
+				Iterator iterator = ((Iterable) model).iterator();
+				for (int i = 0; i <= index; ++i) {
+					value = iterator.next();
+				}
+			} else {
+				throw new BindingException(getClass().getName() + " expected the model to be an iterable but it was " + model.getClass().getName() + ".");
 			}
 		} else {
-			value = new ObjectWrapper(value).getIndexedValue(key, index);
+			value = new ObjectWrapper(model).getIndexedValue(key, index);
 		}
 		return value;
 	}
