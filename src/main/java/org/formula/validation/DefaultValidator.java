@@ -5,8 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.formula.binding.FormBinding;
 
@@ -35,10 +33,6 @@ public class DefaultValidator implements Validator {
 
 	@Override
 	public List<FieldValidator> getFieldValidators(String property) {
-		Matcher matcher = Pattern.compile(".*\\.\\d*").matcher(property);
-		if (!matcher.matches()) {
-			property += ".0";
-		}
 		List<FieldValidator> propertyFieldValidators = new ArrayList<FieldValidator>();
 		for (FieldValidator fieldValidator : this.fieldValidators) {
 			if (fieldValidator.getFormFieldBinding().getProperty().equals(property)) {

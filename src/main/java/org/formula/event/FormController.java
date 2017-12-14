@@ -58,21 +58,19 @@ public class FormController<T extends Object, U extends Object> extends DefaultF
 	}
 
 	protected void enableProperty(String property, boolean enable) {
-		enableProperty(property, enable, 0);
-	}
-
-	protected void enableProperty(String property, boolean enable, int index) {
-		property = property + "." + index;
 		this.formBinder.enableProperty(property, enable);
 	}
 
+	protected void enableProperty(String property, boolean enable, int index) {
+		this.formBinder.enableProperty(property, enable, index);
+	}
+
 	protected void focusProperty(String property) {
-		focusProperty(property, 0);
+		this.formBinder.focusProperty(property);
 	}
 
 	protected void focusProperty(String property, int index) {
-		property = property + "." + index;
-		this.formBinder.focusProperty(property);
+		this.formBinder.focusProperty(property, index);
 	}
 
 	@Override

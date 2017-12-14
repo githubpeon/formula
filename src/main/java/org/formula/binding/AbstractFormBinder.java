@@ -77,7 +77,7 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 	@Override
 	public void setProperty(String property, Object value, int index) {
 		property = property.replaceFirst("#", "#" + index);
-		this.propertyMap.put(property, value);
+		setProperty(property, value);
 	}
 
 	@Override
@@ -89,11 +89,23 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 	}
 
 	@Override
+	public void enableProperty(String property, boolean enable, int index) {
+		property = property.replaceFirst("#", "#" + index);
+		enableProperty(property, enable);
+	}
+
+	@Override
 	public void focusProperty(String property) {
 		for (FieldValidator fieldValidator : getValidator().getFieldValidators(property)) {
 			FormFieldBinding formFieldBinding = fieldValidator.getFormFieldBinding();
 			formFieldBinding.focus();
 		}
+	}
+
+	@Override
+	public void focusProperty(String property, int index) {
+		property = property.replaceFirst("#", "#" + index);
+		focusProperty(property);
 	}
 
 	protected Object getForm() {
