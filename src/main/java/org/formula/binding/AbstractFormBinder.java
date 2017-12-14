@@ -3,14 +3,12 @@ package org.formula.binding;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
 
 import org.formula.annotation.Form;
 import org.formula.annotation.FormField;
@@ -44,11 +42,11 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 	private final Set<FormEnableListener> formEnableListeners = new HashSet<FormEnableListener>();
 	private final PropertyMap propertyMap = new PropertyMap();
 	private final Map<String, Converter> converters = new HashMap<String, Converter>();
-	private final List<ObjectWrapper> objectWrappers = new ArrayList<ObjectWrapper>();
-	private final Map<Class, List<Object>> containers = new HashMap<Class, List<Object>>();
 	private final Map<String, Set<FormFieldBinding>> formFieldBindings = new HashMap<String, Set<FormFieldBinding>>();
+	private final Map<String, Integer> indexMap = new HashMap<String, Integer>();
 	private Object form;
 	private Object model;
+	private Map<Object, ObjectWrapper> objectWrappers = new HashMap<Object, ObjectWrapper>();
 	private Validator validator;
 	private ConfirmationHandler confirmationHandler;
 	private boolean initialized = false;
@@ -67,8 +65,20 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 	}
 
 	@Override
+	public Object getProperty(String property, int index) {
+		property = property.replaceFirst("#", "#" + index);
+		return getProperty(property);
+	}
+
+	@Override
 	public void setProperty(String property, Object value) {
 		this.propertyMap.put(property, value);
+	}
+
+	@Override
+	public void setProperty(String property, Object value, int index) {
+		property = property.replaceFirst("#", "#" + index);
+		setProperty(property, value);
 	}
 
 	@Override
@@ -82,11 +92,25 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 	}
 
 	@Override
+	public void enableProperty(String property, boolean enable, int index) {
+		property = property.replaceFirst("#", "#" + index);
+		enableProperty(property, enable);
+	}
+
+	@Override
 	public void focusProperty(String property) {
-		for (FieldValidator fieldValidator : getValidator().getFieldValidators(property)) {
-			FormFieldBinding formFieldBinding = fieldValidator.getFormFieldBinding();
-			formFieldBinding.focus();
+		Set<FormFieldBinding> formFieldBindings = this.formFieldBindings.get(property);
+		if (formFieldBindings != null) {
+			for (FormFieldBinding formFieldBinding : formFieldBindings) {
+				formFieldBinding.focus();
+			}
 		}
+	}
+
+	@Override
+	public void focusProperty(String property, int index) {
+		property = property.replaceFirst("#", "#" + index);
+		focusProperty(property);
 	}
 
 	@Override
@@ -97,6 +121,12 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 				formFieldBinding.show(visible);
 			}
 		}
+	}
+
+	@Override
+	public void showProperty(String property, boolean visible, int index) {
+		property = property.replaceFirst("#", "#" + index);
+		showProperty(property, visible);
 	}
 
 	protected Object getForm() {
@@ -121,19 +151,23 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 
 	@Override
 	public void setModel(Object model) {
-		if (this.model != null) {
-			throw new BindingException("FormBinder " + getClass().getName() + " is already bound to model " + this.model.getClass().getName() + ".");
-		}
 		this.initialized = false;
-		if (model instanceof Collection) {
-			Iterator iterator = ((Collection) model).iterator();
-			while (iterator.hasNext()) {
-				this.objectWrappers.add(new ObjectWrapper(iterator.next()));
-			}
-		} else if (!(model instanceof Map)) {
-			this.objectWrappers.add(new ObjectWrapper(model));
-		}
+		this.objectWrappers.clear();
 		this.model = model;
+
+		if (!(model instanceof Map)) {
+			this.objectWrappers.put(model, new ObjectWrapper(model));
+			for (String key : this.propertyMap.keySet()) {
+				Matcher matcher = FormBinder.INDEXDED_PROPERTY_KEY_PATTERN.matcher(key);
+				if (matcher.matches()) {
+					String indexKey = matcher.group(2);
+					int index = Integer.valueOf(matcher.group(3));
+					Object indexedModel = getIndexedValueAt(indexKey, index, getModel());
+					this.objectWrappers.put(indexedModel, new ObjectWrapper(indexedModel));
+				}
+			}
+		}
+
 		init();
 		validate();
 	}
@@ -189,20 +223,18 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 			Object formField = field.get(container);
 			FormField formFieldAnnotation = field.getAnnotation(FormField.class);
 
-			// We add the index of the container to the property key so we can have multiple copies of the same
-			// container in one and the same form. We're going to assume the model is an Iterable when
-			// we have multiple copies.
-			List<Object> classContainers = containers.get(container.getClass());
-			if (classContainers == null) {
-				classContainers = new ArrayList<Object>();
-				containers.put(container.getClass(), classContainers);
-			}
-			if (!classContainers.contains(container)) {
-				classContainers.add(container);
-			}
-
 			String property = formFieldAnnotation.property();
-			String indexedProperty = property + "." + classContainers.indexOf(container);
+			if (property.contains("#")) {
+				int index = 0;
+				String key = container.getClass() + ";" + property;
+				if (!this.indexMap.containsKey(key)) {
+					indexMap.put(key, 0);
+				} else {
+					index = indexMap.get(key) + 1;
+					indexMap.put(key, index);
+				}
+				property = property.replace("#", "#" + String.valueOf(index));
+			}
 
 			boolean required = formFieldAnnotation.required();
 			Converter converter = null;
@@ -210,23 +242,16 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 			try {
 				converter = (Converter) converterClass.newInstance();
 				if (!property.isEmpty()) {
-					addConverter(indexedProperty, converter);
+					addConverter(property, converter);
 				}
 			} catch (Exception e) {
 				throw new BindingException(e.getClass().getName() + " when creating converter " + converterClass.getName() + ".", e);
 			}
 
 			String[] labelProperties = formFieldAnnotation.labelProperties();
-			for (int i = 0; i < labelProperties.length; ++i) {
-				labelProperties[i] = labelProperties[i] + "." + classContainers.indexOf(container);
-			}
-
 			String optionsProperty = formFieldAnnotation.optionsProperty();
-			if (!optionsProperty.isEmpty()) {
-				optionsProperty = optionsProperty + "." + classContainers.indexOf(container);
-			}
 
-			FormFieldBinding formFieldBinding = bindFormField(formField, indexedProperty, labelProperties, optionsProperty, required, converter);
+			FormFieldBinding formFieldBinding = bindFormField(formField, property, labelProperties, optionsProperty, required, converter);
 
 			Class validatorClass = formFieldAnnotation.validator();
 			try {
@@ -237,10 +262,10 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 				throw new BindingException(e.getClass().getName() + " when creating validator " + validatorClass.getName() + ".", e);
 			}
 
-			Set<FormFieldBinding> formFieldBindingSet = this.formFieldBindings.get(indexedProperty);
+			Set<FormFieldBinding> formFieldBindingSet = this.formFieldBindings.get(property);
 			if (formFieldBindingSet == null) {
 				formFieldBindingSet = new HashSet<FormFieldBinding>();
-				this.formFieldBindings.put(indexedProperty, formFieldBindingSet);
+				this.formFieldBindings.put(property, formFieldBindingSet);
 			}
 			formFieldBindingSet.add(formFieldBinding);
 
@@ -424,21 +449,21 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 
 	private void read() {
 		for (String key : this.propertyMap.keySet()) {
-			// We're assuming we have a key in the form of property.index, for example password.0, where
-			// the index corresponds to the index of the objectwrapper for the specific model object
-			// we're reading from. If it's not a map. In that case we just read it straight from the key.
 			Object value = null;
-			int lastIndex = key.lastIndexOf(".");
-			int index = Integer.parseInt(key.substring(lastIndex + 1));
-
 			if (getModel() instanceof Map) {
-				Map modelMap = (Map) model;
+				Map modelMap = (Map) getModel();
 				value = modelMap.get(key);
-				if (value == null && index == 0) {
-					value = modelMap.get(key.substring(0, lastIndex));
-				}
 			} else {
-				value = this.objectWrappers.get(index).getValue(key.substring(0, lastIndex));
+				Matcher matcher = FormBinder.INDEXDED_PROPERTY_KEY_PATTERN.matcher(key);
+				if (matcher.matches()) {
+					String indexKey = matcher.group(2);
+					int index = Integer.valueOf(matcher.group(3));
+					String property = matcher.group(4);
+					value = getIndexedValueAt(indexKey, index, getModel());
+					value = this.objectWrappers.get(value).getValue(property);
+				} else {
+					value = this.objectWrappers.get(getModel()).getValue(key);
+				}
 			}
 			this.propertyMap.put(key, value);
 		}
@@ -447,21 +472,44 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 	@SuppressWarnings("unchecked")
 	private void write() {
 		for (String key : this.propertyMap.keySet()) {
-			// And we do the same thing when writing.
-			int lastIndex = key.lastIndexOf(".");
-			int index = Integer.parseInt(key.substring(lastIndex + 1));
 			Object value = this.propertyMap.get(key);
 
 			if (getModel() instanceof Map) {
 				Map modelMap = (Map) model;
 				modelMap.put(key, value);
-				modelMap.put(key.substring(0, lastIndex), value);
 			} else {
-				if (this.objectWrappers.get(index).getProperty(key.substring(0, lastIndex)).isWritable()) {
-					this.objectWrappers.get(index).setValue(key.substring(0, lastIndex), value);
+				Matcher matcher = FormBinder.INDEXDED_PROPERTY_KEY_PATTERN.matcher(key);
+				if (matcher.matches()) {
+					String indexKey = matcher.group(2);
+					int index = Integer.valueOf(matcher.group(3));
+					String property = matcher.group(4);
+					Object indexedModel = getIndexedValueAt(indexKey, index, getModel());
+					if (this.objectWrappers.get(indexedModel).getProperty(property).isWritable()) {
+						this.objectWrappers.get(indexedModel).setValue(property, value);
+					}
+				} else {
+					if (this.objectWrappers.get(getModel()).getProperty(key).isWritable()) {
+						this.objectWrappers.get(getModel()).setValue(key, value);
+					}
 				}
 			}
 		}
 	}
 
+	private Object getIndexedValueAt(String key, int index, Object model) {
+		Object value = null;
+		if (key == null || key.isEmpty()) {
+			if (model instanceof Iterator) {
+				Iterator iterator = ((Iterable) model).iterator();
+				for (int i = 0; i <= index; ++i) {
+					value = iterator.next();
+				}
+			} else {
+				throw new BindingException(getClass().getName() + " expected the model to be an iterable but it was " + model.getClass().getName() + ".");
+			}
+		} else {
+			value = new ObjectWrapper(model).getIndexedValue(key, index);
+		}
+		return value;
+	}
 }

@@ -26,8 +26,7 @@ public abstract class FormFieldBinding<T extends Object> extends FormBinding<T> 
 		this.required = required;
 		this.converter = converter;
 
-		// This means the property field is empty and has had a '.0' or whatever added to it.
-		if (!property.startsWith(".")) {
+		if (!property.isEmpty()) {
 			this.propertyMap.put(property, null);
 			propertyMap.addPropertyChangeListener(property, this);
 		}

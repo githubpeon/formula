@@ -42,48 +42,43 @@ public class FormController<T extends Object, U extends Object> extends DefaultF
 	}
 
 	protected Object getProperty(String property) {
-		return getProperty(property, 0);
-	}
-
-	protected Object getProperty(String property, int index) {
-		property = property + "." + index;
 		return this.formBinder.getProperty(property);
 	}
 
-	protected void setProperty(String property, Object value) {
-		setProperty(property, value, 0);
+	protected Object getProperty(String property, int index) {
+		return this.formBinder.getProperty(property, index);
 	}
 
-	protected void setProperty(String property, Object value, int index) {
-		property = property + "." + index;
+	protected void setProperty(String property, Object value) {
 		this.formBinder.setProperty(property, value);
 	}
 
-	protected void enableProperty(String property, boolean enable) {
-		enableProperty(property, enable, 0);
+	protected void setProperty(String property, Object value, int index) {
+		this.formBinder.setProperty(property, value, index);
 	}
 
-	protected void enableProperty(String property, boolean enable, int index) {
-		property = property + "." + index;
+	protected void enableProperty(String property, boolean enable) {
 		this.formBinder.enableProperty(property, enable);
 	}
 
-	protected void showProperty(String property, boolean visible) {
-		showProperty(property, visible, 0);
+	protected void enableProperty(String property, boolean enable, int index) {
+		this.formBinder.enableProperty(property, enable, index);
 	}
 
-	protected void showProperty(String property, boolean visible, int index) {
-		property = property + "." + index;
+	protected void showProperty(String property, boolean visible) {
 		this.formBinder.showProperty(property, visible);
 	}
 
+	protected void showProperty(String property, boolean visible, int index) {
+		this.formBinder.showProperty(property, visible, index);
+	}
+
 	protected void focusProperty(String property) {
-		focusProperty(property, 0);
+		this.formBinder.focusProperty(property);
 	}
 
 	protected void focusProperty(String property, int index) {
-		property = property + "." + index;
-		this.formBinder.focusProperty(property);
+		this.formBinder.focusProperty(property, index);
 	}
 
 	@Override

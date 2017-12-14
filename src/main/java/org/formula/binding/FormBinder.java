@@ -1,5 +1,7 @@
 package org.formula.binding;
 
+import java.util.regex.Pattern;
+
 import org.formula.event.FormEnableListener;
 import org.formula.event.FormFieldListener;
 import org.formula.event.FormListener;
@@ -8,19 +10,31 @@ import org.formula.validation.ConfirmationHandler;
 
 public interface FormBinder {
 
+	public final static Pattern INDEXDED_PROPERTY_KEY_PATTERN = Pattern.compile("((.*)\\.)?#(\\d*)\\.(.*)");
+
 	public void setForm(Object form);
 
 	public void setModel(Object model);
 
 	public Object getProperty(String property);
 
+	public Object getProperty(String property, int index);
+
 	public void setProperty(String property, Object value);
+
+	public void setProperty(String property, Object value, int index);
 
 	public void enableProperty(String property, boolean enable);
 
-	public void showProperty(String property, boolean visible);
+	public void enableProperty(String property, boolean enable, int index);
 
 	public void focusProperty(String property);
+
+	public void focusProperty(String property, int index);
+
+	public void showProperty(String property, boolean visible);
+
+	public void showProperty(String property, boolean visible, int index);
 
 	public void refresh();
 
