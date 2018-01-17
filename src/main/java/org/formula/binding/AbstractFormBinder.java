@@ -3,6 +3,9 @@ package org.formula.binding;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -390,7 +393,20 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 	}
 
 	protected void fireFormEvent(FormEvent e) {
-		Object[] listeners = formListeners.toArray();
+		ArrayList<Object> listeners = new ArrayList<Object>(formListeners);
+		// We want to formbindings like for example the commit button binding to do their things
+		// before anything the application does.
+		Collections.sort(listeners, new Comparator<Object>() {
+			public int compare(Object listener1, Object listener2) {
+				if (listener1 instanceof FormBinding && !(listener2 instanceof FormBinding)) {
+					return -1;
+				} else if (listener2 instanceof FormBinding && !(listener1 instanceof FormBinding)) {
+					return 1;
+				}
+				return 0;
+			}
+		});
+
 		for (Object listener : listeners) {
 			FormListener formListener = (FormListener) listener;
 			if (e instanceof FormPropertyEditedEvent) {
