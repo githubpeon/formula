@@ -12,8 +12,8 @@ import org.formula.converter.Converter;
 
 public class JListBinding extends SwingFormFieldBinding<JList> implements ListSelectionListener {
 
-	public JListBinding(JList jList, FormBinder formBinder, PropertyMap propertyMap, String property, String[] labelProperties, String optionsProperty, boolean required, Converter converter) {
-		super(jList, formBinder, propertyMap, property, labelProperties, optionsProperty, required, converter);
+	public JListBinding(JList jList, FormBinder formBinder, PropertyMap propertyMap, String property, String[] labelProperties, String optionsProperty, boolean required, boolean errorIndicator, Converter converter) {
+		super(jList, formBinder, propertyMap, property, labelProperties, optionsProperty, required, errorIndicator, converter);
 		jList.addListSelectionListener(this);
 	}
 

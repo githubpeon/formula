@@ -12,8 +12,8 @@ import org.formula.converter.Converter;
 
 public abstract class SwingFormFieldBinding<T extends JComponent> extends FormFieldBinding<T> {
 
-	public SwingFormFieldBinding(T view, FormBinder formBinder, PropertyMap propertyMap, String property, String[] labelProperties, String optionsProperty, boolean required, Converter converter) {
-		super(view, formBinder, propertyMap, property, labelProperties, optionsProperty, required, converter);
+	public SwingFormFieldBinding(T view, FormBinder formBinder, PropertyMap propertyMap, String property, String[] labelProperties, String optionsProperty, boolean required, boolean errorIndicator, Converter converter) {
+		super(view, formBinder, propertyMap, property, labelProperties, optionsProperty, required, errorIndicator, converter);
 	}
 
 	public void show(boolean visible) {
@@ -25,11 +25,13 @@ public abstract class SwingFormFieldBinding<T extends JComponent> extends FormFi
 	}
 
 	protected void setValidationError(boolean hasError) {
-		Object labeledBy = getView().getClientProperty("labeledBy");
-		if (labeledBy instanceof JComponent) {
-			Color color = (hasError ? Color.RED : (Color) UIManager.getLookAndFeelDefaults().get("Label.foreground"));
-			((JComponent) labeledBy).setForeground(color);
-		}
+	    if(isErrorIndicator()) {
+    		Object labeledBy = getView().getClientProperty("labeledBy");
+    		if (labeledBy instanceof JComponent) {
+    			Color color = (hasError ? Color.RED : (Color) UIManager.getLookAndFeelDefaults().get("Label.foreground"));
+    			((JComponent) labeledBy).setForeground(color);
+    		}
+	    }
 	}
 
 }

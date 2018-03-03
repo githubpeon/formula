@@ -12,18 +12,20 @@ public abstract class FormFieldBinding<T extends Object> extends FormBinding<T> 
 	private String optionsProperty;
 	private PropertyMap propertyMap;
 	private boolean required;
+	private boolean errorIndicator;
 	private Converter converter;
 
 	private boolean reading;
 	private boolean writing;
 
-	public FormFieldBinding(T view, FormBinder formBinder, PropertyMap propertyMap, String property, String[] labelProperties, String optionsProperty, boolean required, Converter converter) {
+	public FormFieldBinding(T view, FormBinder formBinder, PropertyMap propertyMap, String property, String[] labelProperties, String optionsProperty, boolean required, boolean errorIndicator, Converter converter) {
 		super(view, formBinder);
 		this.propertyMap = propertyMap;
 		this.property = property;
 		this.labelProperties = labelProperties;
 		this.optionsProperty = optionsProperty;
 		this.required = required;
+		this.errorIndicator = errorIndicator;
 		this.converter = converter;
 
 		if (!property.isEmpty()) {
@@ -84,7 +86,15 @@ public abstract class FormFieldBinding<T extends Object> extends FormBinding<T> 
 		this.required = required;
 	}
 
-	public boolean isEmpty() {
+	public boolean isErrorIndicator() {
+        return errorIndicator;
+    }
+
+    public void setErrorIndicator(boolean errorIndicator) {
+        this.errorIndicator = errorIndicator;
+    }
+
+    public boolean isEmpty() {
 		Object value = getPropertyMap().get(getProperty());
 		if (value == null) {
 			return true;

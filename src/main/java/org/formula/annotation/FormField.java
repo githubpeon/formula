@@ -20,6 +20,8 @@ public @interface FormField {
 
 	boolean required() default false;
 
+	boolean errorIndicator() default true;
+
 	Class validator() default DefaultFieldValidator.class;
 
 	Class converter() default DefaultConverter.class;

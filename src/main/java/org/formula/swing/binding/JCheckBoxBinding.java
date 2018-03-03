@@ -13,8 +13,8 @@ public class JCheckBoxBinding extends SwingFormFieldBinding<JCheckBox> implement
 
 	private String pattern = null;
 
-	public JCheckBoxBinding(JCheckBox jCheckBox, FormBinder formBinder, PropertyMap propertyMap, String property, String[] labelProperties, String optionsProperty, boolean required, Converter converter) {
-		super(jCheckBox, formBinder, propertyMap, property, labelProperties, optionsProperty, required, converter);
+	public JCheckBoxBinding(JCheckBox jCheckBox, FormBinder formBinder, PropertyMap propertyMap, String property, String[] labelProperties, String optionsProperty, boolean required, boolean errorIndicator, Converter converter) {
+		super(jCheckBox, formBinder, propertyMap, property, labelProperties, optionsProperty, required, errorIndicator, converter);
 		jCheckBox.addActionListener(this);
 		this.pattern = jCheckBox.getText();
 	}

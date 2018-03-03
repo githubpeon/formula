@@ -10,8 +10,8 @@ public class JLabelBinding extends SwingFormFieldBinding<JLabel> {
 
 	private String pattern = null;
 
-	public JLabelBinding(JLabel jLabel, FormBinder formBinder, PropertyMap propertyMap, String property, String[] labelProperties, String optionsProperty, boolean required, Converter converter) {
-		super(jLabel, formBinder, propertyMap, property, labelProperties, optionsProperty, required, converter);
+	public JLabelBinding(JLabel jLabel, FormBinder formBinder, PropertyMap propertyMap, String property, String[] labelProperties, String optionsProperty, boolean required, boolean errorIndicator, Converter converter) {
+		super(jLabel, formBinder, propertyMap, property, labelProperties, optionsProperty, required, errorIndicator, converter);
 		this.pattern = jLabel.getText();
 	}
 

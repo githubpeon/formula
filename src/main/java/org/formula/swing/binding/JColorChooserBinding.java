@@ -12,8 +12,8 @@ import org.formula.converter.Converter;
 
 public class JColorChooserBinding extends SwingFormFieldBinding<JColorChooser> implements ChangeListener {
 
-	public JColorChooserBinding(JColorChooser jColorChooser, FormBinder formBinder, PropertyMap propertyMap, String property, String[] labelProperties, String optionsProperty, boolean required, Converter converter) {
-		super(jColorChooser, formBinder, propertyMap, property, labelProperties, optionsProperty, required, converter);
+	public JColorChooserBinding(JColorChooser jColorChooser, FormBinder formBinder, PropertyMap propertyMap, String property, String[] labelProperties, String optionsProperty, boolean required, boolean errorIndicator, Converter converter) {
+		super(jColorChooser, formBinder, propertyMap, property, labelProperties, optionsProperty, required, errorIndicator, converter);
 		jColorChooser.getSelectionModel().addChangeListener(this);
 	}
 

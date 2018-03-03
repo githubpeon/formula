@@ -10,8 +10,8 @@ import org.formula.converter.Converter;
 
 public class JTextComponentBinding extends SwingFormFieldBinding<JTextComponent> implements DocumentListener {
 
-	public JTextComponentBinding(JTextComponent jTextComponent, FormBinder formBinder, PropertyMap propertyMap, String property, String[] labelProperties, String optionsProperty, boolean required, Converter converter) {
-		super(jTextComponent, formBinder, propertyMap, property, labelProperties, optionsProperty, required, converter);
+	public JTextComponentBinding(JTextComponent jTextComponent, FormBinder formBinder, PropertyMap propertyMap, String property, String[] labelProperties, String optionsProperty, boolean required, boolean errorIndicator, Converter converter) {
+		super(jTextComponent, formBinder, propertyMap, property, labelProperties, optionsProperty, required, errorIndicator, converter);
 		jTextComponent.getDocument().addDocumentListener(this);
 	}
 

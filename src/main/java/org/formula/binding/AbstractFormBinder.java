@@ -240,6 +240,8 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 			}
 
 			boolean required = formFieldAnnotation.required();
+			boolean errorIndicator = formFieldAnnotation.errorIndicator();
+
 			Converter converter = null;
 			Class converterClass = formFieldAnnotation.converter();
 			try {
@@ -254,7 +256,7 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 			String[] labelProperties = formFieldAnnotation.labelProperties();
 			String optionsProperty = formFieldAnnotation.optionsProperty();
 
-			FormFieldBinding formFieldBinding = bindFormField(formField, property, labelProperties, optionsProperty, required, converter);
+			FormFieldBinding formFieldBinding = bindFormField(formField, property, labelProperties, optionsProperty, required, errorIndicator, converter);
 
 			Class validatorClass = formFieldAnnotation.validator();
 			try {
@@ -287,7 +289,7 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 		}
 	}
 
-	protected abstract FormFieldBinding bindFormField(Object formField, String property, String[] labelProperties, String optionsProperty, boolean required, Converter converter);
+	protected abstract FormFieldBinding bindFormField(Object formField, String property, String[] labelProperties, String optionsProperty, boolean required, boolean errorIndicator, Converter converter);
 
 	@Override
 	public void propertyChange(PropertyChangeEvent e) {

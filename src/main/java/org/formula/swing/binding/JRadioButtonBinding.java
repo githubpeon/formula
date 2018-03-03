@@ -11,8 +11,8 @@ import org.formula.converter.Converter;
 
 public class JRadioButtonBinding extends SwingFormFieldBinding<JRadioButton> implements ActionListener {
 
-	public JRadioButtonBinding(JRadioButton jRadioButton, FormBinder formBinder, PropertyMap propertyMap, String property, String[] labelProperties, String optionsProperty, boolean required, Converter converter) {
-		super(jRadioButton, formBinder, propertyMap, property, labelProperties, optionsProperty, required, converter);
+	public JRadioButtonBinding(JRadioButton jRadioButton, FormBinder formBinder, PropertyMap propertyMap, String property, String[] labelProperties, String optionsProperty, boolean required, boolean errorIndicator, Converter converter) {
+		super(jRadioButton, formBinder, propertyMap, property, labelProperties, optionsProperty, required, errorIndicator, converter);
 		jRadioButton.addActionListener(this);
 	}
 
