@@ -84,7 +84,7 @@ public class JButtonCommitBinding extends FormBinding<JButton> implements Action
 	@Override
 	public void formEditValidation(FormEditValidationEvent e) {
 		ValidationResult validationResult = e.getValidationResult();
-		if (validationResult.hasPropertyErrors()
+		if (validationResult.hasErrors()
 				|| !validationResult.isAllowCommit()) {
 			getView().setEnabled(false);
 			updateToolTipText(validationResult);
