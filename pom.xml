@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.formula</groupId>
     <artifactId>formula</artifactId>
-    <version>1.0.8</version>
+    <version>1.0.9</version>
     <name>Formula</name>
     <description>A simple library for creating Java forms and binding their input components to model properties.</description>
     <properties>
