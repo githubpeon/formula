@@ -146,6 +146,12 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 		this.form = form;
 		propertyMap.addPropertyChangeListener(this);
 		bindForm();
+
+		if(this.model != null) {
+		    this.initialized = false;
+	        init();
+	        validate();
+		}
 	}
 
 	protected Object getModel() {

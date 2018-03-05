@@ -132,17 +132,19 @@ public class SwingFormBinder extends AbstractFormBinder implements FocusListener
 	protected ValidationResult validate() {
 		ValidationResult validationResult = super.validate();
 
-		for (FieldValidator fieldValidator : getValidator().getFieldValidators()) {
-			SwingFormFieldBinding swingFormFieldBinding = (SwingFormFieldBinding) fieldValidator.getFormFieldBinding();
-			swingFormFieldBinding.setValidationError(false);
-		}
-		if (validationResult != null) {
-			for (ValidationMessage validationMessage : validationResult.getPropertyValidationMessages()) {
-				for (FieldValidator fieldValidator : getValidator().getFieldValidators(validationMessage.getProperty())) {
-					SwingFormFieldBinding swingFormFieldBinding = (SwingFormFieldBinding) fieldValidator.getFormFieldBinding();
-					swingFormFieldBinding.setValidationError(true);
-				}
-			}
+		if(getValidator() != null) {
+    		for (FieldValidator fieldValidator : getValidator().getFieldValidators()) {
+    			SwingFormFieldBinding swingFormFieldBinding = (SwingFormFieldBinding) fieldValidator.getFormFieldBinding();
+    			swingFormFieldBinding.setValidationError(false);
+    		}
+    		if (validationResult != null) {
+    			for (ValidationMessage validationMessage : validationResult.getPropertyValidationMessages()) {
+    				for (FieldValidator fieldValidator : getValidator().getFieldValidators(validationMessage.getProperty())) {
+    					SwingFormFieldBinding swingFormFieldBinding = (SwingFormFieldBinding) fieldValidator.getFormFieldBinding();
+    					swingFormFieldBinding.setValidationError(true);
+    				}
+    			}
+    		}
 		}
 		return validationResult;
 	}
