@@ -18,6 +18,8 @@ public @interface FormField {
 
 	String optionsProperty() default "";
 
+	String maxProperty() default "";
+
 	boolean required() default false;
 
 	boolean errorIndicator() default true;

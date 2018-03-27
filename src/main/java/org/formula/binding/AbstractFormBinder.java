@@ -261,8 +261,9 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 
 			String[] labelProperties = formFieldAnnotation.labelProperties();
 			String optionsProperty = formFieldAnnotation.optionsProperty();
+			String maxProperty = formFieldAnnotation.maxProperty();
 
-			FormFieldBinding formFieldBinding = bindFormField(formField, property, labelProperties, optionsProperty, required, errorIndicator, converter);
+			FormFieldBinding formFieldBinding = bindFormField(formField, property, labelProperties, optionsProperty, maxProperty, required, errorIndicator, converter);
 
 			Class validatorClass = formFieldAnnotation.validator();
 			try {
@@ -295,7 +296,7 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 		}
 	}
 
-	protected abstract FormFieldBinding bindFormField(Object formField, String property, String[] labelProperties, String optionsProperty, boolean required, boolean errorIndicator, Converter converter);
+	protected abstract FormFieldBinding bindFormField(Object formField, String property, String[] labelProperties, String optionsProperty, String maxProperty, boolean required, boolean errorIndicator, Converter converter);
 
 	@Override
 	public void propertyChange(PropertyChangeEvent e) {
