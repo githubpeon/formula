@@ -74,7 +74,9 @@ public class JButtonCommitBinding extends FormBinding<JButton> implements Action
 
 	@Override
 	public void formFieldFocusGained(FormFieldFocusGainedEvent e) {
-		SwingUtilities.getRootPane(getView()).setDefaultButton(getView());
+	    if(getView().isDefaultCapable()) {
+	        SwingUtilities.getRootPane(getView()).setDefaultButton(getView());
+	    }
 	}
 
 	@Override
