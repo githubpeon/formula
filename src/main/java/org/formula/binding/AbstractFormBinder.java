@@ -147,10 +147,10 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 		propertyMap.addPropertyChangeListener(this);
 		bindForm();
 
-		if(this.model != null) {
-		    this.initialized = false;
-	        init();
-	        validate();
+		if (this.model != null) {
+			this.initialized = false;
+			init();
+			validate();
 		}
 	}
 
@@ -326,11 +326,16 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 
 	@Override
 	public void commit() {
+		commit(this);
+	}
+
+	@Override
+	public void commit(Object source) {
 		ValidationResult validationResult = validate();
 		fireFormValidationEvent(new FormCommitValidationEvent(this, validationResult));
 		if (!validationResult.hasErrors() && (this.confirmationHandler == null || this.confirmationHandler.confirmCommit(this.propertyMap))) {
 			write();
-			fireFormEvent(new FormCommittedEvent(this));
+			fireFormEvent(new FormCommittedEvent(source));
 		}
 	}
 

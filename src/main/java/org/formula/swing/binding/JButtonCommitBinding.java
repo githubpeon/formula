@@ -44,7 +44,7 @@ public class JButtonCommitBinding extends FormBinding<JButton> implements Action
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		getFormBinder().commit();
+		getFormBinder().commit(getView());
 	}
 
 	@Override
@@ -74,9 +74,9 @@ public class JButtonCommitBinding extends FormBinding<JButton> implements Action
 
 	@Override
 	public void formFieldFocusGained(FormFieldFocusGainedEvent e) {
-	    if(getView().isDefaultCapable()) {
-	        SwingUtilities.getRootPane(getView()).setDefaultButton(getView());
-	    }
+		if (getView().isDefaultCapable()) {
+			SwingUtilities.getRootPane(getView()).setDefaultButton(getView());
+		}
 	}
 
 	@Override
@@ -102,11 +102,11 @@ public class JButtonCommitBinding extends FormBinding<JButton> implements Action
 
 	private void updateToolTipText(ValidationResult validationResult) {
 		if (validationResult == null) {
-		    if(getView().getAction() != null) {
-		        getView().getAction().putValue(Action.SHORT_DESCRIPTION, this.defaultToolTipText);
-		    } else {
-		        getView().setToolTipText(this.defaultToolTipText);
-		    }
+			if (getView().getAction() != null) {
+				getView().getAction().putValue(Action.SHORT_DESCRIPTION, this.defaultToolTipText);
+			} else {
+				getView().setToolTipText(this.defaultToolTipText);
+			}
 		} else {
 			getView().setEnabled(false);
 			StringBuilder stringBuilder = new StringBuilder();
@@ -120,17 +120,17 @@ public class JButtonCommitBinding extends FormBinding<JButton> implements Action
 				stringBuilder.append(validationMessage.getMessage() + "\n");
 			}
 			if (!stringBuilder.toString().isEmpty()) {
-	            if(getView().getAction() != null) {
-	                getView().getAction().putValue(Action.SHORT_DESCRIPTION, "<html>" + stringBuilder.toString().replace("\n", "<br>") + "</html>");
-	            } else {
-	                getView().setToolTipText("<html>" + stringBuilder.toString().replace("\n", "<br>") + "</html>");
-	            }
+				if (getView().getAction() != null) {
+					getView().getAction().putValue(Action.SHORT_DESCRIPTION, "<html>" + stringBuilder.toString().replace("\n", "<br>") + "</html>");
+				} else {
+					getView().setToolTipText("<html>" + stringBuilder.toString().replace("\n", "<br>") + "</html>");
+				}
 			} else {
-	            if(getView().getAction() != null) {
-	                getView().getAction().putValue(Action.SHORT_DESCRIPTION, this.defaultToolTipText);
-	            } else {
-	                getView().setToolTipText(this.defaultToolTipText);
-	            }
+				if (getView().getAction() != null) {
+					getView().getAction().putValue(Action.SHORT_DESCRIPTION, this.defaultToolTipText);
+				} else {
+					getView().setToolTipText(this.defaultToolTipText);
+				}
 			}
 		}
 	}

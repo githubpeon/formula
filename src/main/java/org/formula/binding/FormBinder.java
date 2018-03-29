@@ -40,6 +40,8 @@ public interface FormBinder {
 
 	public void commit();
 
+	public void commit(Object source);
+
 	public void rollback();
 
 	public void enable(boolean enable, boolean requestFocus);
