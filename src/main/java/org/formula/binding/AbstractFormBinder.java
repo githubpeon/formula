@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -477,6 +478,7 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 		return propertyMap;
 	}
 
+	@SuppressWarnings("unchecked")
 	private void read() {
 		for (String key : this.propertyMap.keySet()) {
 			Object value = null;
@@ -494,6 +496,12 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 				} else {
 					value = this.objectWrappers.get(getModel()).getValue(key);
 				}
+			}
+			if (value instanceof List) {
+				// This is most likely an optionsProperty. If not then someone's done something wrong somewhere.
+				ArrayList<?> list = new ArrayList();
+				list.addAll((List) value);
+				value = list;
 			}
 			this.propertyMap.put(key, value);
 		}
