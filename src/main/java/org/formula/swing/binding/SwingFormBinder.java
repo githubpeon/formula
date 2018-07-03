@@ -57,7 +57,7 @@ public class SwingFormBinder extends AbstractFormBinder implements FocusListener
 	}
 
 	@Override
-	protected FormFieldBinding bindFormField(Object formField, String property, String[] labelProperties, String optionsProperty, String maxProperty, boolean required, boolean errorIndicator, Converter converter) {
+	protected FormFieldBinding bindFormField(Object formField, String property, String[] labelProperties, String optionsProperty, String maxProperty, String selectionProperty, boolean required, boolean errorIndicator, Converter converter) {
 		if (formField instanceof JComponent) {
 			((JComponent) formField).addFocusListener(this);
 		}
@@ -82,7 +82,7 @@ public class SwingFormBinder extends AbstractFormBinder implements FocusListener
 		} else if (formField instanceof JColorChooser) {
 			return new JColorChooserBinding((JColorChooser) formField, this, getPropertyMap(), property, labelProperties, optionsProperty, required, errorIndicator, converter);
 		} else if (formField instanceof JTable) {
-			return new JTableBinding((JTable) formField, this, getPropertyMap(), property, labelProperties, optionsProperty, required, errorIndicator, converter);
+			return new JTableBinding((JTable) formField, this, getPropertyMap(), property, labelProperties, optionsProperty, selectionProperty, required, errorIndicator, converter);
 		}
 		throw new BindingException("Binding for class " + formField.getClass().getName() + " is not implemented in binder " + getClass().getName());
 	}

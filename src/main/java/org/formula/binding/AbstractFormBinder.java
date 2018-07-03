@@ -263,8 +263,9 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 			String[] labelProperties = formFieldAnnotation.labelProperties();
 			String optionsProperty = formFieldAnnotation.optionsProperty();
 			String maxProperty = formFieldAnnotation.maxProperty();
+			String selectionProperty = formFieldAnnotation.selectionProperty();
 
-			FormFieldBinding formFieldBinding = bindFormField(formField, property, labelProperties, optionsProperty, maxProperty, required, errorIndicator, converter);
+			FormFieldBinding formFieldBinding = bindFormField(formField, property, labelProperties, optionsProperty, maxProperty, selectionProperty, required, errorIndicator, converter);
 
 			Class validatorClass = formFieldAnnotation.validator();
 			try {
@@ -297,7 +298,7 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 		}
 	}
 
-	protected abstract FormFieldBinding bindFormField(Object formField, String property, String[] labelProperties, String optionsProperty, String maxProperty, boolean required, boolean errorIndicator, Converter converter);
+	protected abstract FormFieldBinding bindFormField(Object formField, String property, String[] labelProperties, String optionsProperty, String maxProperty, String selectionProperty, boolean required, boolean errorIndicator, Converter converter);
 
 	@Override
 	public void propertyChange(PropertyChangeEvent e) {
@@ -338,6 +339,11 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 			write();
 			fireFormEvent(new FormCommittedEvent(source));
 		}
+	}
+
+	@Override
+	public void commitProperty(String property) {
+		writeProperty(property);
 	}
 
 	@Override
@@ -507,28 +513,32 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private void write() {
 		for (String key : this.propertyMap.keySet()) {
-			Object value = this.propertyMap.get(key);
+			writeProperty(key);
+		}
+	}
 
-			if (getModel() instanceof Map) {
-				Map modelMap = (Map) model;
-				modelMap.put(key, value);
+	@SuppressWarnings("unchecked")
+	private void writeProperty(String key) {
+		Object value = this.propertyMap.get(key);
+
+		if (getModel() instanceof Map) {
+			Map modelMap = (Map) model;
+			modelMap.put(key, value);
+		} else {
+			Matcher matcher = FormBinder.INDEXDED_PROPERTY_KEY_PATTERN.matcher(key);
+			if (matcher.matches()) {
+				String indexKey = matcher.group(2);
+				int index = Integer.valueOf(matcher.group(3));
+				String property = matcher.group(4);
+				Object indexedModel = getIndexedValueAt(indexKey, index, getModel());
+				if (this.objectWrappers.get(indexedModel).getProperty(property).isWritable()) {
+					this.objectWrappers.get(indexedModel).setValue(property, value);
+				}
 			} else {
-				Matcher matcher = FormBinder.INDEXDED_PROPERTY_KEY_PATTERN.matcher(key);
-				if (matcher.matches()) {
-					String indexKey = matcher.group(2);
-					int index = Integer.valueOf(matcher.group(3));
-					String property = matcher.group(4);
-					Object indexedModel = getIndexedValueAt(indexKey, index, getModel());
-					if (this.objectWrappers.get(indexedModel).getProperty(property).isWritable()) {
-						this.objectWrappers.get(indexedModel).setValue(property, value);
-					}
-				} else {
-					if (this.objectWrappers.get(getModel()).getProperty(key).isWritable()) {
-						this.objectWrappers.get(getModel()).setValue(key, value);
-					}
+				if (this.objectWrappers.get(getModel()).getProperty(key).isWritable()) {
+					this.objectWrappers.get(getModel()).setValue(key, value);
 				}
 			}
 		}

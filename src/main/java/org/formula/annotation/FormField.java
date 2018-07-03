@@ -14,11 +14,13 @@ public @interface FormField {
 
 	String property() default "";
 
-    String[] labelProperties() default {};
+	String[] labelProperties() default { };
 
 	String optionsProperty() default "";
 
 	String maxProperty() default "";
+
+	String selectionProperty() default "";
 
 	boolean required() default false;
 
