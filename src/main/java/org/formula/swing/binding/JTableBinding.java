@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableModel;
@@ -22,9 +23,12 @@ public class JTableBinding extends SwingFormFieldBinding<JTable> implements List
 
 	public JTableBinding(JTable jTable, FormBinder formBinder, PropertyMap propertyMap, String property, String[] labelProperties, String optionsProperty, String selectionProperty, boolean required, boolean errorIndicator, Converter converter) {
 		super(jTable, formBinder, propertyMap, property, labelProperties, optionsProperty, required, errorIndicator, converter);
-		jTable.getSelectionModel().addListSelectionListener(this);
 
-		this.selectionProperty = selectionProperty;
+		if (!selectionProperty.isEmpty()) {
+			getPropertyMap().put(selectionProperty, null);
+			jTable.getSelectionModel().addListSelectionListener(this);
+			this.selectionProperty = selectionProperty;
+		}
 	}
 
 	@Override
@@ -71,14 +75,18 @@ public class JTableBinding extends SwingFormFieldBinding<JTable> implements List
 				selectedObjects.add(formulaTabelModel.getObjects().get(row));
 			}
 
-			getPropertyMap().put(this.selectionProperty, selectedObjects);
+			if (getView().getSelectionModel().getSelectionMode() == ListSelectionModel.SINGLE_SELECTION) {
+				getPropertyMap().put(this.selectionProperty, selectedObjects.get(0));
+			} else {
+				getPropertyMap().put(this.selectionProperty, selectedObjects);
+			}
 			getFormBinder().commitProperty(this.selectionProperty);
 		}
 	}
 
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
-		if (!e.getValueIsAdjusting()) {
+		if (!e.getValueIsAdjusting() && this.selectionProperty != null) {
 			doWriteSelection();
 		}
 	}
