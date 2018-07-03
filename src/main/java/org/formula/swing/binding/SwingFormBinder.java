@@ -22,6 +22,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
+import javax.swing.JTable;
 import javax.swing.text.JTextComponent;
 
 import org.formula.annotation.CommitForm;
@@ -80,6 +81,8 @@ public class SwingFormBinder extends AbstractFormBinder implements FocusListener
 			return new JProgressBarBinding((JProgressBar) formField, this, getPropertyMap(), property, labelProperties, optionsProperty, maxProperty, required, errorIndicator, converter);
 		} else if (formField instanceof JColorChooser) {
 			return new JColorChooserBinding((JColorChooser) formField, this, getPropertyMap(), property, labelProperties, optionsProperty, required, errorIndicator, converter);
+		} else if (formField instanceof JTable) {
+			return new JTableBinding((JTable) formField, this, getPropertyMap(), property, labelProperties, optionsProperty, required, errorIndicator, converter);
 		}
 		throw new BindingException("Binding for class " + formField.getClass().getName() + " is not implemented in binder " + getClass().getName());
 	}
@@ -132,19 +135,19 @@ public class SwingFormBinder extends AbstractFormBinder implements FocusListener
 	protected ValidationResult validate() {
 		ValidationResult validationResult = super.validate();
 
-		if(getValidator() != null) {
-    		for (FieldValidator fieldValidator : getValidator().getFieldValidators()) {
-    			SwingFormFieldBinding swingFormFieldBinding = (SwingFormFieldBinding) fieldValidator.getFormFieldBinding();
-    			swingFormFieldBinding.setValidationError(false);
-    		}
-    		if (validationResult != null) {
-    			for (ValidationMessage validationMessage : validationResult.getPropertyValidationMessages()) {
-    				for (FieldValidator fieldValidator : getValidator().getFieldValidators(validationMessage.getProperty())) {
-    					SwingFormFieldBinding swingFormFieldBinding = (SwingFormFieldBinding) fieldValidator.getFormFieldBinding();
-    					swingFormFieldBinding.setValidationError(true);
-    				}
-    			}
-    		}
+		if (getValidator() != null) {
+			for (FieldValidator fieldValidator : getValidator().getFieldValidators()) {
+				SwingFormFieldBinding swingFormFieldBinding = (SwingFormFieldBinding) fieldValidator.getFormFieldBinding();
+				swingFormFieldBinding.setValidationError(false);
+			}
+			if (validationResult != null) {
+				for (ValidationMessage validationMessage : validationResult.getPropertyValidationMessages()) {
+					for (FieldValidator fieldValidator : getValidator().getFieldValidators(validationMessage.getProperty())) {
+						SwingFormFieldBinding swingFormFieldBinding = (SwingFormFieldBinding) fieldValidator.getFormFieldBinding();
+						swingFormFieldBinding.setValidationError(true);
+					}
+				}
+			}
 		}
 		return validationResult;
 	}
