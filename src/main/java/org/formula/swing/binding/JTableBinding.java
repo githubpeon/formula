@@ -76,7 +76,11 @@ public class JTableBinding extends SwingFormFieldBinding<JTable> implements List
 			}
 
 			if (getView().getSelectionModel().getSelectionMode() == ListSelectionModel.SINGLE_SELECTION) {
-				getPropertyMap().put(this.selectionProperty, selectedObjects.get(0));
+				if (selectedObjects.size() > 0) {
+					getPropertyMap().put(this.selectionProperty, selectedObjects.get(0));
+				} else {
+					getPropertyMap().put(this.selectionProperty, null);
+				}
 			} else {
 				getPropertyMap().put(this.selectionProperty, selectedObjects);
 			}
