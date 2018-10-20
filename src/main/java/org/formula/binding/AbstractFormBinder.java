@@ -16,6 +16,7 @@ import java.util.regex.Matcher;
 
 import org.formula.annotation.Form;
 import org.formula.annotation.FormField;
+import org.formula.annotation.TableFormField;
 import org.formula.converter.Converter;
 import org.formula.event.FormCommitValidationEvent;
 import org.formula.event.FormCommittedEvent;
@@ -252,7 +253,7 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 			Converter converter = null;
 			Class converterClass = formFieldAnnotation.converter();
 			try {
-				converter = (Converter) converterClass.newInstance();
+				converter = (Converter) converterClass.getDeclaredConstructor().newInstance();
 				if (!property.isEmpty()) {
 					addConverter(property, converter);
 				}
@@ -263,13 +264,20 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 			String[] labelProperties = formFieldAnnotation.labelProperties();
 			String optionsProperty = formFieldAnnotation.optionsProperty();
 			String maxProperty = formFieldAnnotation.maxProperty();
-			String selectionProperty = formFieldAnnotation.selectionProperty();
+			String selectionProperty = "";
+			String filteredProperty = "";
+			
+			if (field.isAnnotationPresent(TableFormField.class)) {
+				TableFormField tableFormFieldAnnotation = field.getAnnotation(TableFormField.class);
+				selectionProperty = tableFormFieldAnnotation.selectionProperty();
+				filteredProperty = tableFormFieldAnnotation.filteredProperty();
+			}
 
-			FormFieldBinding formFieldBinding = bindFormField(formField, property, labelProperties, optionsProperty, maxProperty, selectionProperty, required, errorIndicator, converter);
+			FormFieldBinding formFieldBinding = bindFormField(formField, property, labelProperties, optionsProperty, maxProperty, required, errorIndicator, converter, selectionProperty, filteredProperty);
 
 			Class validatorClass = formFieldAnnotation.validator();
 			try {
-				FieldValidator fieldValidator = (FieldValidator) validatorClass.newInstance();
+				FieldValidator fieldValidator = (FieldValidator) validatorClass.getDeclaredConstructor().newInstance();
 				fieldValidator.setFormFieldBinding(formFieldBinding);
 				getValidator().addFieldValidator(fieldValidator);
 			} catch (Exception e) {
@@ -298,7 +306,7 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 		}
 	}
 
-	protected abstract FormFieldBinding bindFormField(Object formField, String property, String[] labelProperties, String optionsProperty, String maxProperty, String selectionProperty, boolean required, boolean errorIndicator, Converter converter);
+	protected abstract FormFieldBinding bindFormField(Object formField, String property, String[] labelProperties, String optionsProperty, String maxProperty, boolean required, boolean errorIndicator, Converter converter, String selectionProperty, String filteredProperty);
 
 	@Override
 	public void propertyChange(PropertyChangeEvent e) {

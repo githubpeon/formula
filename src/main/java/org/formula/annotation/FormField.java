@@ -20,7 +20,7 @@ public @interface FormField {
 
 	String maxProperty() default "";
 
-	String selectionProperty() default "";
+	//String selectionProperty() default "";
 
 	boolean required() default false;
 
