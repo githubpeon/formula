@@ -134,6 +134,10 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 		showProperty(property, visible);
 	}
 
+	protected Set<FormFieldBinding> getFormFieldBindings(String property) {
+		return this.formFieldBindings.get(property);
+	}
+	
 	protected Object getForm() {
 		return this.form;
 	}
@@ -518,9 +522,19 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 				value = list;
 			}
 			this.propertyMap.put(key, value);
+			propertyRead(key, value);
 		}
 	}
 
+	/**
+	 * Override to do extra things after a property has been read,
+	 * @param key
+	 * @param value
+	 */
+	protected void propertyRead(String key, Object value) {
+		
+	}
+	
 	private void write() {
 		for (String key : this.propertyMap.keySet()) {
 			writeProperty(key);
