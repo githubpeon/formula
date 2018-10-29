@@ -4,11 +4,9 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.beans.PropertyChangeEvent;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -133,25 +131,6 @@ public class SwingFormBinder extends AbstractFormBinder implements FocusListener
 		return fields;
 	}
 
-	@Override	
-	protected void propertyRead(String property, Object value) {
-		// Convoluted hack to make sure a fireTableDataChanged is fired on a table even if the new collection of object equals the old one.
-		if(value instanceof Collection) {
-			Set<FormFieldBinding> formFieldBindings = getFormFieldBindings(property);
-			if(formFieldBindings != null) {
-				for(FormFieldBinding formFieldBinding : formFieldBindings) {
-					if(formFieldBinding instanceof JTableBinding) {
-						JTableBinding jTableBinding = (JTableBinding)formFieldBinding;
-						if(jTableBinding.getProperty().equals(property)) {
-							PropertyChangeEvent e = new PropertyChangeEvent(getPropertyMap(), property, value, value);
-							jTableBinding.propertyChange(e);
-						}
-					}
-				}
-			}
-		}		
-	}
-	
 	@Override
 	protected ValidationResult validate() {
 		ValidationResult validationResult = super.validate();
@@ -172,7 +151,7 @@ public class SwingFormBinder extends AbstractFormBinder implements FocusListener
 		}
 		return validationResult;
 	}
-	
+
 	@Override
 	public void focusGained(FocusEvent e) {
 		fireFormFieldEvent(new FormFieldFocusGainedEvent(this, e.getSource()));
