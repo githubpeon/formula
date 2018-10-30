@@ -38,6 +38,8 @@ public interface FormBinder {
 
 	public void refresh();
 
+	public void refreshProperty(String property);
+
 	public void commit();
 
 	public void commit(Object source);

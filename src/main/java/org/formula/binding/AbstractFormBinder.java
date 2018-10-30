@@ -30,6 +30,7 @@ import org.formula.event.FormFieldListener;
 import org.formula.event.FormInitializedEvent;
 import org.formula.event.FormListener;
 import org.formula.event.FormPropertyEditedEvent;
+import org.formula.event.FormPropertyRefreshedEvent;
 import org.formula.event.FormRefreshedEvent;
 import org.formula.event.FormRolledBackEvent;
 import org.formula.event.FormValidationListener;
@@ -189,6 +190,12 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 		fireFormEvent(new FormRefreshedEvent(this));
 	}
 
+	@Override
+	public void refreshProperty(String property) {
+		readProperty(property);
+		fireFormEvent(new FormPropertyRefreshedEvent(this, property));
+	}
+
 	public Validator getValidator() {
 		return validator;
 	}
@@ -266,7 +273,7 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 			String maxProperty = formFieldAnnotation.maxProperty();
 			String selectionProperty = "";
 			String filteredProperty = "";
-			
+
 			if (field.isAnnotationPresent(TableFormField.class)) {
 				TableFormField tableFormFieldAnnotation = field.getAnnotation(TableFormField.class);
 				selectionProperty = tableFormFieldAnnotation.selectionProperty();
@@ -444,6 +451,8 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 				}
 			} else if (e instanceof FormInitializedEvent) {
 				formListener.formInitialized((FormInitializedEvent) e);
+			} else if (e instanceof FormPropertyRefreshedEvent) {
+				formListener.formPropertyRefreshed((FormPropertyRefreshedEvent) e);
 			} else if (e instanceof FormRefreshedEvent) {
 				formListener.formRefreshed((FormRefreshedEvent) e);
 			} else if (e instanceof FormCommittedEvent) {
@@ -495,30 +504,34 @@ public abstract class AbstractFormBinder implements FormBinder, PropertyChangeLi
 	@SuppressWarnings("unchecked")
 	private void read() {
 		for (String key : this.propertyMap.keySet()) {
-			Object value = null;
-			if (getModel() instanceof Map) {
-				Map modelMap = (Map) getModel();
-				value = modelMap.get(key);
-			} else {
-				Matcher matcher = FormBinder.INDEXDED_PROPERTY_KEY_PATTERN.matcher(key);
-				if (matcher.matches()) {
-					String indexKey = matcher.group(2);
-					int index = Integer.valueOf(matcher.group(3));
-					String property = matcher.group(4);
-					value = getIndexedValueAt(indexKey, index, getModel());
-					value = this.objectWrappers.get(value).getValue(property);
-				} else {
-					value = this.objectWrappers.get(getModel()).getValue(key);
-				}
-			}
-			if (value instanceof List) {
-				// This is most likely an optionsProperty. If not then someone's done something wrong somewhere.
-				ArrayList<?> list = new ArrayList();
-				list.addAll((List) value);
-				value = list;
-			}
-			this.propertyMap.put(key, value);
+			readProperty(key);
 		}
+	}
+
+	private void readProperty(String key) {
+		Object value = null;
+		if (getModel() instanceof Map) {
+			Map modelMap = (Map) getModel();
+			value = modelMap.get(key);
+		} else {
+			Matcher matcher = FormBinder.INDEXDED_PROPERTY_KEY_PATTERN.matcher(key);
+			if (matcher.matches()) {
+				String indexKey = matcher.group(2);
+				int index = Integer.valueOf(matcher.group(3));
+				String property = matcher.group(4);
+				value = getIndexedValueAt(indexKey, index, getModel());
+				value = this.objectWrappers.get(value).getValue(property);
+			} else {
+				value = this.objectWrappers.get(getModel()).getValue(key);
+			}
+		}
+		if (value instanceof List) {
+			// This is most likely an optionsProperty. If not then someone's done something wrong somewhere.
+			ArrayList<?> list = new ArrayList();
+			list.addAll((List) value);
+			value = list;
+		}
+		this.propertyMap.put(key, value);
 	}
 
 	private void write() {

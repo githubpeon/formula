@@ -20,6 +20,7 @@ import org.formula.event.FormFieldListener;
 import org.formula.event.FormInitializedEvent;
 import org.formula.event.FormListener;
 import org.formula.event.FormPropertyEditedEvent;
+import org.formula.event.FormPropertyRefreshedEvent;
 import org.formula.event.FormRefreshedEvent;
 import org.formula.event.FormRolledBackEvent;
 import org.formula.event.FormValidationListener;
@@ -45,6 +46,11 @@ public class JButtonCommitBinding extends FormBinding<JButton> implements Action
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		getFormBinder().commit(getView());
+	}
+
+	@Override
+	public void formPropertyRefreshed(FormPropertyRefreshedEvent e) {
+		// We don't care about this.
 	}
 
 	@Override

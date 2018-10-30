@@ -11,6 +11,7 @@ import org.formula.event.FormCommittedEvent;
 import org.formula.event.FormInitializedEvent;
 import org.formula.event.FormListener;
 import org.formula.event.FormPropertyEditedEvent;
+import org.formula.event.FormPropertyRefreshedEvent;
 import org.formula.event.FormRefreshedEvent;
 import org.formula.event.FormRolledBackEvent;
 
@@ -36,6 +37,11 @@ public class JButtonRollbackBinding extends FormBinding<JButton> implements Acti
 	@Override
 	public void formInitialized(FormInitializedEvent e) {
 		getView().setEnabled(false);
+	}
+
+	@Override
+	public void formPropertyRefreshed(FormPropertyRefreshedEvent e) {
+		// We don't care about this.
 	}
 
 	@Override

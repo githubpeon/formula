@@ -13,6 +13,11 @@ public class DefaultFormListener implements FormListener, FormFieldListener, For
 	}
 
 	@Override
+	public void formPropertyRefreshed(FormPropertyRefreshedEvent e) {
+
+	}
+
+	@Override
 	public void formRefreshed(FormRefreshedEvent e) {
 
 	}

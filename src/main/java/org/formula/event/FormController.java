@@ -93,4 +93,9 @@ public class FormController<T extends Object, U extends Object> extends DefaultF
 	protected void refresh() {
 		this.formBinder.refresh();
 	}
+
+	protected void refreshProperty(String property) {
+		this.formBinder.refreshProperty(property);
+	}
+
 }
