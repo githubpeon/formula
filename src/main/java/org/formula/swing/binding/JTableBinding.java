@@ -32,12 +32,12 @@ public class JTableBinding extends SwingFormFieldBinding<JTable> implements List
 			jTable.getSelectionModel().addListSelectionListener(this);
 			this.selectionProperty = selectionProperty;
 		}
-		
+
 		if (!filteredProperty.isEmpty()) {
 			getPropertyMap().put(filteredProperty, null);
 			jTable.getRowSorter().addRowSorterListener(this);
 			this.filteredProperty = filteredProperty;
-		}		
+		}
 	}
 
 	@Override
@@ -81,6 +81,7 @@ public class JTableBinding extends SwingFormFieldBinding<JTable> implements List
 
 			int[] selectedRows = getView().getSelectedRows();
 			for (int row : selectedRows) {
+				row = getView().convertRowIndexToModel(row);
 				selectedObjects.add(formulaTableModel.getObjects().get(row));
 			}
 
@@ -110,16 +111,16 @@ public class JTableBinding extends SwingFormFieldBinding<JTable> implements List
 			FormulaTableModel formulaTableModel = (FormulaTableModel) getView().getModel();
 			List filteredObjects = new ArrayList();
 
-            for(int row = 0;row < getView().getRowCount(); ++row) {
-            	filteredObjects.add(formulaTableModel.getObjects().get(getView().convertRowIndexToModel(row)));
-            }
-            
+			for (int row = 0; row < getView().getRowCount(); ++row) {
+				filteredObjects.add(formulaTableModel.getObjects().get(getView().convertRowIndexToModel(row)));
+			}
+
 			getPropertyMap().put(this.filteredProperty, filteredObjects);
 
 			getFormBinder().commitProperty(this.filteredProperty);
 		}
-	}	
-	
+	}
+
 	@Override
 	public void sorterChanged(RowSorterEvent e) {
 		doWriteFilter();
