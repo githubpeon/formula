@@ -10,7 +10,7 @@ public class PropertyMap extends HashMap<String, Object> {
 	 *
 	 */
 	private static final long serialVersionUID = 1917423877552589417L;
-	private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+	private final PropertyChangeSupport propertyChangeSupport = new PropertyMapPropertyChangeSupport(this);
 
 	@Override
 	public Object put(String property, Object newValue) {
